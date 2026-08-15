@@ -12,6 +12,7 @@ import { BreakdownPanel, BreakdownRow } from "@/components/shared/Breakdown"
 import { TemplateCards } from "@/components/shared/TemplateCards"
 import { ToolLayout } from "@/components/shared/ToolLayout"
 import { SideField } from "@/components/shared/SideField"
+import { PositionInfoFields } from "@/components/shared/PositionInfoFields"
 import { pnlTexts } from "@/lib/texts"
 import { calcPnLLinear, calcPnLCoinM, fmt, type Side } from "@/lib/calculators"
 import { Calculator, ShieldAlert, ArrowDownUp, FunctionSquare, NotebookPen, ListChecks, Coins, CircleDollarSign, Percent, TrendingUp, TrendingDown } from "lucide-react"
@@ -36,6 +37,9 @@ function PnlLinearForm({ stable }: { stable: string }) {
   const [closeP, setCloseP] = useState("")
   const [qty, setQty] = useState("")
   const [margin, setMargin] = useState("")
+  const [currency, setCurrency] = useState(stable)
+  const [leverage, setLeverage] = useState("")
+  const [positionId, setPositionId] = useState("")
   const [result, setResult] = useState<ReturnType<typeof calcPnLLinear> | null>(null)
   const [error, setError] = useState("")
 
@@ -57,20 +61,33 @@ function PnlLinearForm({ stable }: { stable: string }) {
     <ToolLayout
       form={
         <SectionCard title={t.section.title} description={t.section.description} icon={<ArrowDownUp className="h-4 w-4" />}>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-            <SideField value={side} onChange={(v) => setSide(v)} />
-            <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
-              <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.open.label}>
-              <Input type="number" step="any" placeholder={t.fields.open.placeholder} value={openP} onChange={e => setOpenP(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.close.label}>
-              <Input type="number" step="any" placeholder={t.fields.close.placeholder} value={closeP} onChange={e => setCloseP(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.margin.label} hint={t.fields.margin.hint}>
-              <Input type="number" step="any" placeholder={t.fields.margin.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
-            </FormField>
+          <div className="space-y-4">
+            <PositionInfoFields
+              currency={currency}
+              onCurrencyChange={setCurrency}
+              leverage={leverage}
+              onLeverageChange={setLeverage}
+              direction={side}
+              onDirectionChange={setSide}
+              positionId={positionId}
+              onPositionIdChange={setPositionId}
+              showDirection={false}
+            />
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+              <SideField value={side} onChange={(v) => setSide(v)} />
+              <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
+                <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.open.label}>
+                <Input type="number" step="any" placeholder={t.fields.open.placeholder} value={openP} onChange={e => setOpenP(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.close.label}>
+                <Input type="number" step="any" placeholder={t.fields.close.placeholder} value={closeP} onChange={e => setCloseP(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.margin.label} hint={t.fields.margin.hint}>
+                <Input type="number" step="any" placeholder={t.fields.margin.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
+              </FormField>
+            </div>
           </div>
         </SectionCard>
       }
@@ -113,12 +130,16 @@ function PnlLinearForm({ stable }: { stable: string }) {
             variant="pnlLinear"
             params={{
               side: side.toUpperCase(),
+              direction: side.toUpperCase(),
               market: `${stable}-M`,
+              currency: currency.trim() || stable,
               open: String(openP),
               close: String(closeP),
               qty: `${qty} coins`,
               pnl: `${isProfit ? "+" : ""}${fmt(result.pnl, 6)} ${stable}`,
               roi: result.roi !== undefined ? `${fmt(result.roi, 6)}%` : "—",
+              leverage: leverage.trim() ? `${leverage}x` : "—",
+              positionId: positionId.trim() || "—",
             }}
           />
         </div>
@@ -135,6 +156,9 @@ function PnlCoinMForm() {
   const [closeP, setCloseP] = useState("")
   const [qty, setQty] = useState("")
   const [margin, setMargin] = useState("")
+  const [currency, setCurrency] = useState("")
+  const [leverage, setLeverage] = useState("")
+  const [positionId, setPositionId] = useState("")
   const [result, setResult] = useState<ReturnType<typeof calcPnLCoinM> | null>(null)
   const [error, setError] = useState("")
 
@@ -156,23 +180,36 @@ function PnlCoinMForm() {
     <ToolLayout
       form={
         <SectionCard title={t.section.title} description={t.section.description} icon={<Coins className="h-4 w-4" />}>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-            <SideField value={side} onChange={(v) => setSide(v)} />
-            <FormField label={t.fields.coin.label}>
-              <Input placeholder={t.fields.coin.placeholder} value={coinName} onChange={e => setCoinName(e.target.value.toUpperCase())} />
-            </FormField>
-            <FormField label={t.fields.open.label}>
-              <Input type="number" step="any" placeholder={t.fields.open.placeholder} value={openP} onChange={e => setOpenP(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.close.label}>
-              <Input type="number" step="any" placeholder={t.fields.close.placeholder} value={closeP} onChange={e => setCloseP(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
-              <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.margin.label} hint={t.fields.margin.hint}>
-              <Input type="number" step="any" placeholder={t.fields.margin.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
-            </FormField>
+          <div className="space-y-4">
+            <PositionInfoFields
+              currency={currency}
+              onCurrencyChange={setCurrency}
+              leverage={leverage}
+              onLeverageChange={setLeverage}
+              direction={side}
+              onDirectionChange={setSide}
+              positionId={positionId}
+              onPositionIdChange={setPositionId}
+              showDirection={false}
+            />
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+              <SideField value={side} onChange={(v) => setSide(v)} />
+              <FormField label={t.fields.coin.label}>
+                <Input placeholder={t.fields.coin.placeholder} value={coinName} onChange={e => setCoinName(e.target.value.toUpperCase())} />
+              </FormField>
+              <FormField label={t.fields.open.label}>
+                <Input type="number" step="any" placeholder={t.fields.open.placeholder} value={openP} onChange={e => setOpenP(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.close.label}>
+                <Input type="number" step="any" placeholder={t.fields.close.placeholder} value={closeP} onChange={e => setCloseP(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
+                <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.margin.label} hint={t.fields.margin.hint}>
+                <Input type="number" step="any" placeholder={t.fields.margin.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
+              </FormField>
+            </div>
           </div>
         </SectionCard>
       }
@@ -220,14 +257,18 @@ function PnlCoinMForm() {
             variant="pnlCoinM"
             params={{
               side: side.toUpperCase(),
+              direction: side.toUpperCase(),
               market: "Coin-M",
               coin: result.coinName ?? "coins",
+              currency: currency.trim() || result.coinName || "coins",
               open: String(openP),
               close: String(closeP),
               qty: `${qty} USD`,
               pnl: `${isProfit ? "+" : ""}${fmt(result.pnl, 6)} ${result.coinName}`,
               pnlUSD: `${isProfit ? "+" : ""}${fmt(result.pnlUSD ?? 0, 6)} USD`,
               roi: result.roi !== undefined ? `${fmt(result.roi, 6)}%` : "—",
+              leverage: leverage.trim() ? `${leverage}x` : "—",
+              positionId: positionId.trim() || "—",
             }}
           />
         </div>

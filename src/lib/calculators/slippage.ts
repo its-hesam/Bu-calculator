@@ -1,20 +1,53 @@
+import { type Side } from "./shared"
+
 export interface SlippageInputs {
-  triggerPrice: number
-  executedPrice: number
+  side: Side
+  currency: string
+  entryPrice: number
+  stopLossPrice: number
+  actualClosePrice: number
   size: number
+  leverage?: number
 }
 
 export interface SlippageResult {
+  pnlAtStopLoss: number
+  pnlAtActual: number
+  slippagePnl: number
   slippagePct: number
   priceDiff: number
   diff: number
+  margin?: number
+  roiAtStopLoss?: number
+  roiAtActual?: number
 }
 
 export function calcSlippage(input: SlippageInputs): SlippageResult {
-  const { triggerPrice, executedPrice, size } = input
-  const diff = Math.abs(triggerPrice - executedPrice)
-  const slippagePct = (diff / triggerPrice) * 100
+  const { side, entryPrice, stopLossPrice, actualClosePrice, size, leverage } = input
+
+  const pnlFor = (closePrice: number) =>
+    side === "long" ? (closePrice - entryPrice) * size : (entryPrice - closePrice) * size
+
+  const pnlAtStopLoss = pnlFor(stopLossPrice)
+  const pnlAtActual = pnlFor(actualClosePrice)
+
+  const diff = Math.abs(stopLossPrice - actualClosePrice)
+  const slippagePct = (diff / stopLossPrice) * 100
   const priceDiff = diff * size
 
-  return { slippagePct, priceDiff, diff }
+  const margin = leverage && leverage > 0 ? (entryPrice * size) / leverage : undefined
+  const roiAtStopLoss = margin && margin > 0 ? (pnlAtStopLoss / margin) * 100 : undefined
+  const roiAtActual = margin && margin > 0 ? (pnlAtActual / margin) * 100 : undefined
+
+  return {
+    pnlAtStopLoss,
+    pnlAtActual,
+    slippagePnl: pnlAtStopLoss - pnlAtActual,
+    slippagePct,
+    priceDiff,
+    diff,
+    margin,
+    roiAtStopLoss,
+    roiAtActual,
+  }
 }

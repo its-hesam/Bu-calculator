@@ -12,8 +12,9 @@ import { ResultHero } from "@/components/shared/ResultHero"
 import { BreakdownPanel, BreakdownRow } from "@/components/shared/Breakdown"
 import { TemplateCards } from "@/components/shared/TemplateCards"
 import { ToolLayout } from "@/components/shared/ToolLayout"
+import { PositionInfoFields } from "@/components/shared/PositionInfoFields"
 import { feeTexts, commonTexts } from "@/lib/texts"
-import { calcTradingFeeLinear, calcTradingFeeCoinM, fmt } from "@/lib/calculators"
+import { calcTradingFeeLinear, calcTradingFeeCoinM, fmt, type Side } from "@/lib/calculators"
 import { Calculator, ShieldAlert, Receipt, ArrowDownUp, Coins, ArrowDownToLine, ArrowUpFromLine, Crown, BadgePercent } from "lucide-react"
 
 type OrderType = "maker" | "taker"
@@ -55,6 +56,10 @@ function FeeLinearForm({ stable }: { stable: string }) {
   const [size, setSize] = useState("")
   const [entry, setEntry] = useState("")
   const [exit, setExit] = useState("")
+  const [currency, setCurrency] = useState(stable)
+  const [leverage, setLeverage] = useState("")
+  const [direction, setDirection] = useState<Side>("long")
+  const [positionId, setPositionId] = useState("")
   const [result, setResult] = useState<ReturnType<typeof calcTradingFeeLinear> | null>(null)
   const [error, setError] = useState("")
 
@@ -70,26 +75,38 @@ function FeeLinearForm({ stable }: { stable: string }) {
     <ToolLayout
       form={
         <SectionCard title={t.section.title} description={t.section.description} icon={<Receipt className="h-4 w-4" />}>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-            <FormField label={t.fields.vip}>
-              <Select value={vip} onValueChange={setVip}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {VIP_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </FormField>
-            <FormField label={t.fields.size.label} hint={t.fields.size.hint}>
-              <Input type="number" step="any" placeholder={t.fields.size.placeholder} value={size} onChange={e => setSize(e.target.value)} />
-            </FormField>
-            <OrderTypeField label={t.fields.entryType} value={entryType} onChange={(v) => setEntryType(v)} />
-            <OrderTypeField label={t.fields.exitType} value={exitType} onChange={(v) => setExitType(v)} />
-            <FormField label={t.fields.entry.label}>
-              <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.exit.label}>
-              <Input type="number" step="any" placeholder={t.fields.exit.placeholder} value={exit} onChange={e => setExit(e.target.value)} />
-            </FormField>
+          <div className="space-y-4">
+            <PositionInfoFields
+              currency={currency}
+              onCurrencyChange={setCurrency}
+              leverage={leverage}
+              onLeverageChange={setLeverage}
+              direction={direction}
+              onDirectionChange={setDirection}
+              positionId={positionId}
+              onPositionIdChange={setPositionId}
+            />
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+              <FormField label={t.fields.vip}>
+                <Select value={vip} onValueChange={setVip}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {VIP_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label={t.fields.size.label} hint={t.fields.size.hint}>
+                <Input type="number" step="any" placeholder={t.fields.size.placeholder} value={size} onChange={e => setSize(e.target.value)} />
+              </FormField>
+              <OrderTypeField label={t.fields.entryType} value={entryType} onChange={(v) => setEntryType(v)} />
+              <OrderTypeField label={t.fields.exitType} value={exitType} onChange={(v) => setExitType(v)} />
+              <FormField label={t.fields.entry.label}>
+                <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.exit.label}>
+                <Input type="number" step="any" placeholder={t.fields.exit.placeholder} value={exit} onChange={e => setExit(e.target.value)} />
+              </FormField>
+            </div>
           </div>
         </SectionCard>
       }
@@ -129,6 +146,8 @@ function FeeLinearForm({ stable }: { stable: string }) {
             variant="feeLinear"
             params={{
               market: `${stable}-M`,
+              currency: currency.trim() || stable,
+              direction: direction === "long" ? "LONG" : "SHORT",
               vip: `VIP ${result.vipLevel}`,
               maker: `${result.makerRate}%`,
               taker: `${result.takerRate}%`,
@@ -138,6 +157,7 @@ function FeeLinearForm({ stable }: { stable: string }) {
               entryFee: `${fmt(result.entryFee, 6)} ${stable}`,
               exitFee: `${fmt(result.exitFee, 6)} ${stable}`,
               totalFee: `${fmt(result.total, 6)} ${stable}`,
+              positionId: positionId.trim() || "—",
             }}
           />
         </div>
@@ -155,6 +175,10 @@ function FeeCoinMForm() {
   const [qty, setQty] = useState("")
   const [open, setOpen] = useState("")
   const [close, setClose] = useState("")
+  const [currency, setCurrency] = useState("")
+  const [leverage, setLeverage] = useState("")
+  const [direction, setDirection] = useState<Side>("long")
+  const [positionId, setPositionId] = useState("")
   const [result, setResult] = useState<ReturnType<typeof calcTradingFeeCoinM> | null>(null)
   const [error, setError] = useState("")
 
@@ -170,27 +194,39 @@ function FeeCoinMForm() {
     <ToolLayout
       form={
         <SectionCard title={t.section.title} description={t.section.description} icon={<Coins className="h-4 w-4" />}>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-            <FormField label={t.fields.vip}>
-              <Select value={vip} onValueChange={setVip}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{VIP_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
-              </Select>
-            </FormField>
-            <FormField label={t.fields.coin.label}>
-              <Input placeholder={t.fields.coin.placeholder} value={coinName} onChange={e => setCoinName(e.target.value.toUpperCase())} />
-            </FormField>
-            <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
-              <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
-            </FormField>
-            <OrderTypeField label={t.fields.entryType} value={entryType} onChange={(v) => setEntryType(v)} />
-            <OrderTypeField label={t.fields.exitType} value={exitType} onChange={(v) => setExitType(v)} />
-            <FormField label={t.fields.open.label}>
-              <Input type="number" step="any" placeholder={t.fields.open.placeholder} value={open} onChange={e => setOpen(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.close.label}>
-              <Input type="number" step="any" placeholder={t.fields.close.placeholder} value={close} onChange={e => setClose(e.target.value)} />
-            </FormField>
+          <div className="space-y-4">
+            <PositionInfoFields
+              currency={currency}
+              onCurrencyChange={setCurrency}
+              leverage={leverage}
+              onLeverageChange={setLeverage}
+              direction={direction}
+              onDirectionChange={setDirection}
+              positionId={positionId}
+              onPositionIdChange={setPositionId}
+            />
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+              <FormField label={t.fields.vip}>
+                <Select value={vip} onValueChange={setVip}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{VIP_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </FormField>
+              <FormField label={t.fields.coin.label}>
+                <Input placeholder={t.fields.coin.placeholder} value={coinName} onChange={e => setCoinName(e.target.value.toUpperCase())} />
+              </FormField>
+              <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
+                <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
+              </FormField>
+              <OrderTypeField label={t.fields.entryType} value={entryType} onChange={(v) => setEntryType(v)} />
+              <OrderTypeField label={t.fields.exitType} value={exitType} onChange={(v) => setExitType(v)} />
+              <FormField label={t.fields.open.label}>
+                <Input type="number" step="any" placeholder={t.fields.open.placeholder} value={open} onChange={e => setOpen(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.close.label}>
+                <Input type="number" step="any" placeholder={t.fields.close.placeholder} value={close} onChange={e => setClose(e.target.value)} />
+              </FormField>
+            </div>
           </div>
         </SectionCard>
       }
@@ -231,6 +267,8 @@ function FeeCoinMForm() {
             params={{
               market: `Coin-M (${result.coin})`,
               coin: result.coin ?? "coin",
+              currency: currency.trim() || (result.coin ?? "coin"),
+              direction: direction === "long" ? "LONG" : "SHORT",
               vip: `VIP ${result.vipLevel}`,
               maker: `${result.makerRate}%`,
               taker: `${result.takerRate}%`,
@@ -240,6 +278,7 @@ function FeeCoinMForm() {
               openFee: `${result.entryFee.toFixed(8)} ${result.coin}`,
               closeFee: `${result.exitFee.toFixed(8)} ${result.coin}`,
               totalFee: `${result.total.toFixed(8)} ${result.coin}`,
+              positionId: positionId.trim() || "—",
             }}
           />
         </div>

@@ -33,12 +33,29 @@ export const commonTexts = {
   placeholderTitle: "Awaiting calculation",
   placeholderHint: "Fill in the inputs, then run the calculation. Results appear here.",
   stableTabs: { usdt: "USDT-M", usdc: "USDC-M", coin: "Coin-M" },
+  positionInfo: "Position Information",
+  positionInfoDesc: "Identifying details used in the prepared responses",
+  currency: "Currency Name",
+  currencyPlaceholder: "e.g. BTC, ETH, SOL",
+  leverage: "Leverage",
+  leveragePlaceholder: "e.g. 10",
+  positionDirection: "Position Direction",
+  positionId: "Position ID",
+  positionIdPlaceholder: "e.g. 123456789",
+  stopLossQuestion: "Did the position have a Stop Loss?",
+  stopLossPrice: "Stop Loss Price",
+  stopLossPricePlaceholder: "e.g. 57000",
+  slProximityClose: "Your Stop Loss was very close to the liquidation price.",
+  slProximityFar: "Your Stop Loss was relatively far from the liquidation price.",
 }
 
 export type TemplateVariant =
   | "isoLinear"
+  | "isoLinearSL"
   | "isoCoinM"
+  | "isoCoinMSL"
   | "cross"
+  | "crossSL"
   | "pnlLinear"
   | "pnlCoinM"
   | "feeLinear"
@@ -50,57 +67,75 @@ export type TemplateVariant =
 export const templates: Record<TemplateVariant, { colleague: string; user: string }> = {
   isoLinear: {
     colleague:
-      "Internal Note — Isolated Position Liquidation Assessment\n\nPosition: {{side}} {{market}}, entry {{entry}}, size {{size}}, MMR {{mmr}}.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Position Liquidation Assessment\n\nPosition: {{direction}} {{market}} ({{currency}}), entry {{entry}}, size {{size}}, MMR {{mmr}}.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nWe have reviewed your {{side}} {{market}} position. Based on the parameters provided, the estimated liquidation price is {{liq}}.\n\nThe position may be subject to forced closure should the price move {{move}} to reach {{liq}}. We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nWe have reviewed your {{direction}} {{market}} ({{currency}}) position. Based on the parameters provided, the estimated liquidation price is {{liq}}.\n\nThe position may be subject to forced closure should the price move {{move}} to reach {{liq}}. We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+  },
+  isoLinearSL: {
+    colleague:
+      "Internal Note — Isolated Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} {{market}} ({{currency}}), entry {{entry}}, size {{size}}, MMR {{mmr}}.\nStop Loss price: {{stopLoss}}.\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
+    user:
+      "Dear Customer,\n\nWe have reviewed your {{direction}} {{market}} ({{currency}}) position. As the position had a Stop Loss in place, it was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}). We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   isoCoinM: {
     colleague:
-      "Internal Note — Isolated Coin-M Position Liquidation Assessment\n\nPosition: {{side}} Coin-M, quantity {{qty}}, entry {{entry}}, MMR {{mmr}}.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Coin-M Position Liquidation Assessment\n\nPosition: {{direction}} Coin-M ({{currency}}), quantity {{qty}}, entry {{entry}}, MMR {{mmr}}.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nWe have reviewed your {{side}} Coin-M position. Based on the parameters provided, the estimated liquidation price is {{liq}}.\n\nThe position may be subject to forced closure should the price move {{move}} to reach {{liq}}. We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nWe have reviewed your {{direction}} Coin-M ({{currency}}) position. Based on the parameters provided, the estimated liquidation price is {{liq}}.\n\nThe position may be subject to forced closure should the price move {{move}} to reach {{liq}}. We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+  },
+  isoCoinMSL: {
+    colleague:
+      "Internal Note — Isolated Coin-M Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} Coin-M ({{currency}}), quantity {{qty}}, entry {{entry}}, MMR {{mmr}}.\nStop Loss price: {{stopLoss}}.\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
+    user:
+      "Dear Customer,\n\nWe have reviewed your {{direction}} Coin-M ({{currency}}) position. As the position had a Stop Loss in place, it was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}). We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   cross: {
     colleague:
-      "Internal Note — Cross Margin Assessment at {{time}}\n\nVerdict: {{verdict}}.\n{{count}} position(s) · wallet {{wallet}} · unrealized PnL {{pnl}} · equity {{equity}}.\nMaintenance margin {{mm}} → margin ratio {{ratio}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Cross Margin Assessment at {{time}}\n\nPosition: {{direction}} {{currency}} · Position ID {{positionId}}.\nVerdict: {{verdict}}.\n{{count}} position(s) · wallet {{wallet}} · unrealized PnL {{pnl}} · equity {{equity}}.\nMaintenance margin {{mm}} → margin ratio {{ratio}}.\n\nKindly review and confirm at your earliest convenience.",
     user:
       "Dear Customer,\n\nAt {{time}}, your cross-margin account was assessed as {{verdict}}. Your equity stood at {{equity}} against a maintenance margin of {{mm}}, resulting in a margin ratio of {{ratio}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
+  crossSL: {
+    colleague:
+      "Internal Note — Cross Margin Assessment (Stop Loss) at {{time}}\n\nPosition: {{direction}} {{currency}} · Position ID {{positionId}}.\nStop Loss price: {{stopLoss}}.\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\nVerdict: {{verdict}}.\n{{count}} position(s) · wallet {{wallet}} · unrealized PnL {{pnl}} · equity {{equity}}.\nMaintenance margin {{mm}} → margin ratio {{ratio}}.\n\nKindly review and confirm at your earliest convenience.",
+    user:
+      "Dear Customer,\n\nAt {{time}}, your cross-margin account was assessed as {{verdict}}. Your equity stood at {{equity}} against a maintenance margin of {{mm}}, resulting in a margin ratio of {{ratio}}.\n\nAs your position had a Stop Loss in place, it was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+  },
   pnlLinear: {
     colleague:
-      "Internal Note — Realized PnL\n\n{{market}} {{side}} position — entry {{open}}, exit {{close}}, quantity {{qty}}.\nRealized PnL: {{pnl}} · ROI {{roi}}.\n\nKindly review and confirm.",
+      "Internal Note — Realized PnL\n\n{{market}} {{direction}} position ({{currency}}) — entry {{open}}, exit {{close}}, quantity {{qty}}.\nRealized PnL: {{pnl}} · ROI {{roi}} (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour {{market}} {{side}} trade has been closed with a realized PnL of {{pnl}}.\nEntry {{open}} → exit {{close}}, size {{qty}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nYour {{market}} {{direction}} ({{currency}}) trade has been closed with a realized PnL of {{pnl}}.\nEntry {{open}} → exit {{close}}, size {{qty}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   pnlCoinM: {
     colleague:
-      "Internal Note — Realized PnL (Coin-M)\n\nCoin-M {{side}} position ({{coin}}) — entry {{open}}, exit {{close}}, quantity {{qty}}.\nRealized PnL {{pnl}} ≈ {{pnlUSD}} · ROI {{roi}}.\n\nKindly review and confirm.",
+      "Internal Note — Realized PnL (Coin-M)\n\nCoin-M {{direction}} position ({{currency}}) — entry {{open}}, exit {{close}}, quantity {{qty}}.\nRealized PnL {{pnl}} ≈ {{pnlUSD}} · ROI {{roi}} (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour Coin-M {{side}} trade has been closed with a realized PnL of {{pnl}} (approximately {{pnlUSD}}).\nEntry {{open}} → exit {{close}}, size {{qty}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nYour Coin-M {{direction}} ({{currency}}) trade has been closed with a realized PnL of {{pnl}} (approximately {{pnlUSD}}).\nEntry {{open}} → exit {{close}}, size {{qty}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   feeLinear: {
     colleague:
-      "Internal Note — Trading Fee Breakdown\n\n{{market}} ({{vip}}, maker {{maker}} / taker {{taker}}).\nSize {{size}} · entry {{entry}} → exit {{exit}}.\nEntry fee {{entryFee}} · exit fee {{exitFee}} · total {{totalFee}}.\n\nKindly review and confirm.",
+      "Internal Note — Trading Fee Breakdown\n\n{{market}} ({{currency}}) — {{direction}} position, {{vip}}, maker {{maker}} / taker {{taker}}.\nSize {{size}} · entry {{entry}} → exit {{exit}}.\nEntry fee {{entryFee}} · exit fee {{exitFee}} · total {{totalFee}}.\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nFor your {{market}} trade (size {{size}}, entry {{entry}} → exit {{exit}}), the total trading fee is {{totalFee}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nFor your {{market}} ({{currency}}) {{direction}} trade (size {{size}}, entry {{entry}} → exit {{exit}}), the total trading fee is {{totalFee}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   feeCoinM: {
     colleague:
-      "Internal Note — Trading Fee Breakdown (Coin-M)\n\n{{market}} ({{coin}}) — {{vip}}, maker {{maker}} / taker {{taker}}.\nQuantity {{qty}} · open {{open}} → close {{close}}.\nOpen fee {{openFee}} · close fee {{closeFee}} · total {{totalFee}}.\n\nKindly review and confirm.",
+      "Internal Note — Trading Fee Breakdown (Coin-M)\n\n{{market}} ({{currency}}) — {{direction}} position, {{vip}}, maker {{maker}} / taker {{taker}}.\nQuantity {{qty}} · open {{open}} → close {{close}}.\nOpen fee {{openFee}} · close fee {{closeFee}} · total {{totalFee}}.\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nFor your Coin-M trade (quantity {{qty}}, open {{open}} → close {{close}}), the total trading fee is {{totalFee}}, settled in {{coin}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nFor your Coin-M ({{currency}}) {{direction}} trade (quantity {{qty}}, open {{open}} → close {{close}}), the total trading fee is {{totalFee}}, settled in {{currency}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   funding: {
     colleague:
-      "Internal Note — Funding Fee\n\n{{side}} position — size {{size}}, mark price {{mark}}, funding rate {{rate}}.\nFunding fee {{fee}}. Flow: {{flow}}.\n\nKindly review and confirm.",
+      "Internal Note — Funding Fee\n\n{{direction}} {{currency}} position — size {{size}}, mark price {{mark}}, funding rate {{rate}}.\nFunding fee {{fee}}. Flow: {{flow}}.\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour {{side}} position ({{size}}) is subject to a funding fee of {{fee}} at a rate of {{rate}}.\n\n{{flow}}\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nYour {{direction}} {{currency}} position ({{size}}) is subject to a funding fee of {{fee}} at a rate of {{rate}}.\n\n{{flow}}\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   slippage: {
     colleague:
-      "Internal Note — Slippage Assessment\n\nTrigger {{trigger}}, executed {{executed}} (difference {{diff}}), size {{size}}.\nSlippage {{slippage}} · price impact {{priceDiff}}.\n\nKindly review and confirm.",
+      "Internal Note — Slippage Assessment (Stop Loss)\n\nPosition: {{direction}} {{currency}} · Position ID {{positionId}} · leverage {{leverage}}.\nEntry {{entry}}, stop loss {{stopLoss}}, actual close {{actual}} (size {{size}}).\nPnL at Stop Loss: {{pnlAtSL}} · PnL at actual close: {{pnlActual}}.\nSlippage {{slippage}} · price impact {{priceDiff}} · PnL impact {{slippagePnl}}.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour market order triggered at {{trigger}} and was filled at {{executed}}, resulting in a slippage of {{slippage}} ({{priceDiff}} on {{size}}).\n\nMinor differences between the displayed and executed price are considered normal for market orders.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Customer,\n\nYour {{direction}} {{currency}} position (entry {{entry}}) had a Stop Loss at {{stopLoss}} to limit your loss. However, the position was actually closed at {{actual}} due to market conditions, resulting in a slippage of {{slippage}}.\n\nPnL at the Stop Loss price was {{pnlAtSL}}, while the PnL at the actual closing price was {{pnlActual}} — a slippage impact of {{slippagePnl}} on {{size}}.\n\nMinor differences between the displayed and executed price are considered normal for market orders.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
   },
   fundFlow: {
     colleague:
@@ -654,26 +689,45 @@ export const fundingTexts = {
 }
 
 export const slippageTexts = {
-  section: { title: "Slippage Calculator", description: "How far the fill drifted from your trigger" },
+  section: { title: "Slippage Calculator", description: "How far the fill drifted from your intended stop loss" },
   fields: {
-    trigger: { label: "Trigger Price", placeholder: "e.g. 59000" },
-    executed: { label: "Actual Executed Price", placeholder: "e.g. 58850" },
+    entry: { label: "Entry Price", placeholder: "e.g. 60000" },
+    stopLoss: { label: "Stop Loss Price", placeholder: "e.g. 59000" },
+    actual: { label: "Actual Position Closing Price", placeholder: "e.g. 58850" },
     size: { label: "Position Size", hint: "coins", placeholder: "e.g. 0.5" },
   },
   calculate: "Calculate Slippage",
   error: "Please fill all fields.",
-  hero: { eyebrow: "Trigger market order", title: "Slippage" },
-  heroSub: (priceDiff: string, size: string) => `Price difference of ${priceDiff} USDT on ${size} coins`,
-  stats: { slippage: "Slippage %", priceDiff: "Price Diff (USDT)", trigger: "Trigger", executed: "Executed" },
-  breakdown: { slippage: "Slippage %", priceDiff: "Price Difference" },
+  hero: { eyebrow: "Stop loss order slippage", title: "Slippage" },
+  heroSub: (priceDiff: string, currency: string, size: string) => `Price difference of ${priceDiff} ${currency} on ${size} coins`,
+  stats: {
+    slippage: "Slippage %",
+    priceDiff: "Price Diff",
+    pnlAtSL: "PnL at Stop Loss",
+    pnlActual: "PnL at Actual Close",
+    slippagePnl: "Slippage PnL Impact",
+    actual: "Actual Close",
+    stopLoss: "Stop Loss",
+  },
+  breakdown: {
+    slippage: "Slippage %",
+    priceDiff: "Price Difference",
+    pnlAtSL: "PnL if closed at Stop Loss",
+    pnlActual: "PnL at actual closing price",
+    pnlComparison: "PnL Comparison",
+    pnlImpact: "Slippage PnL Impact",
+  },
   formulas: {
-    slippage: "|Trigger − Executed| ÷ Trigger × 100",
-    priceDiff: "|Trigger − Executed| × Position Size",
+    slippage: "|Stop Loss − Actual| ÷ Stop Loss × 100",
+    priceDiff: "|Stop Loss − Actual| × Position Size",
+    pnlLong: "PnL = (Close − Entry) × Position Size",
+    pnlShort: "PnL = (Entry − Close) × Position Size",
+    pnlImpact: "PnL (actual) − PnL (stop loss)",
   },
   about: {
-    heading: "About Market Order Slippage",
+    heading: "About Stop Loss Slippage",
     paragraph1:
-      "This order was placed as a trigger market order and executed at the best available price at the time of execution. Market orders are matched against existing orders in the order book, ensuring execution at the prevailing market price. A defining characteristic of a market order is guaranteed execution regardless of order size. However, owing to prevailing market conditions — including liquidity and volatility — the final execution price may differ slightly from the displayed price.",
+      "A Stop Loss is intended to close the position at a predefined price to limit losses. During volatile or illiquid market conditions, however, the actual fill price may be worse than the Stop Loss price. The slippage is the difference between the PnL you expected at the Stop Loss price and the PnL actually realized at the closing price.",
     paragraph2:
       "This behavior is considered normal for market orders and is a common occurrence across financial markets. It is not regarded as abnormal or unusual.",
   },

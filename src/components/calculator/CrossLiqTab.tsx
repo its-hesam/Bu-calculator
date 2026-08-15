@@ -17,11 +17,14 @@ import { RowPanel } from "@/components/shared/RowPanel"
 import { VerdictBanner } from "@/components/shared/VerdictBanner"
 import { TemplateCards } from "@/components/shared/TemplateCards"
 import { ToolLayout } from "@/components/shared/ToolLayout"
+import { PositionInfoFields } from "@/components/shared/PositionInfoFields"
+import { CheckboxField } from "@/components/shared/CheckboxField"
 import { crossTexts, commonTexts } from "@/lib/texts"
 import {
   calcCrossLinear, calcCrossCoinM, buildGist, buildSteps, buildExplain,
   EXR_RATES, fmt, type CrossLinearResult, type CrossCoinMResult, type CrossResult,
   type Direction, type CrossLinearPositionInput, type CrossCoinMPositionInput, type WalletAsset,
+  type Side, sideLabel,
 } from "@/lib/calculators"
 import {
   Calculator,
@@ -53,6 +56,59 @@ export function CrossLiqTab() {
   )
 }
 
+interface PositionInfoCardProps {
+  currency: string
+  onCurrencyChange: (v: string) => void
+  leverage: string
+  onLeverageChange: (v: string) => void
+  direction: Side
+  onDirectionChange: (v: Side) => void
+  positionId: string
+  onPositionIdChange: (v: string) => void
+  hasSL: boolean
+  onHasSLChange: (v: boolean) => void
+  stopLoss: string
+  onStopLossChange: (v: string) => void
+}
+
+function PositionInfoCard({
+  currency,
+  onCurrencyChange,
+  leverage,
+  onLeverageChange,
+  direction,
+  onDirectionChange,
+  positionId,
+  onPositionIdChange,
+  hasSL,
+  onHasSLChange,
+  stopLoss,
+  onStopLossChange,
+}: PositionInfoCardProps) {
+  return (
+    <SectionCard title={commonTexts.positionInfo} description={commonTexts.positionInfoDesc} icon={<Wallet className="h-4 w-4" />}>
+      <div className="space-y-4">
+        <PositionInfoFields
+          currency={currency}
+          onCurrencyChange={onCurrencyChange}
+          leverage={leverage}
+          onLeverageChange={onLeverageChange}
+          direction={direction}
+          onDirectionChange={onDirectionChange}
+          positionId={positionId}
+          onPositionIdChange={onPositionIdChange}
+        />
+        <CheckboxField checked={hasSL} onChange={onHasSLChange} label={commonTexts.stopLossQuestion} />
+        {hasSL && (
+          <FormField label={commonTexts.stopLossPrice}>
+            <Input type="number" step="any" placeholder={commonTexts.stopLossPricePlaceholder} value={stopLoss} onChange={e => onStopLossChange(e.target.value)} />
+          </FormField>
+        )}
+      </div>
+    </SectionCard>
+  )
+}
+
 interface LinearPosState {
   id: number
   symbol: string
@@ -70,6 +126,12 @@ function CrossLinearForm({ stable }: { stable: string }) {
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
   const [positions, setPositions] = useState<LinearPosState[]>([])
+  const [currency, setCurrency] = useState(stable)
+  const [leverage, setLeverage] = useState("")
+  const [direction, setDirection] = useState<Side>("long")
+  const [positionId, setPositionId] = useState("")
+  const [hasSL, setHasSL] = useState(false)
+  const [stopLoss, setStopLoss] = useState("")
   const [result, setResult] = useState<CrossLinearResult | null>(null)
   const [error, setError] = useState("")
   const idRef = useRef(0)
@@ -114,6 +176,20 @@ function CrossLinearForm({ stable }: { stable: string }) {
     <ToolLayout
       form={
         <>
+          <PositionInfoCard
+            currency={currency}
+            onCurrencyChange={setCurrency}
+            leverage={leverage}
+            onLeverageChange={setLeverage}
+            direction={direction}
+            onDirectionChange={setDirection}
+            positionId={positionId}
+            onPositionIdChange={setPositionId}
+            hasSL={hasSL}
+            onHasSLChange={setHasSL}
+            stopLoss={stopLoss}
+            onStopLossChange={setStopLoss}
+          />
           <SectionCard title={t.wallet.section.title} description={t.wallet.section.description} icon={<Wallet className="h-4 w-4" />}>
             <FormField label={t.wallet.fields.wallet(stable).label}>
               <Input type="number" step="any" placeholder={t.wallet.fields.wallet(stable).placeholder} value={wallet} onChange={e => setWallet(e.target.value)} />
@@ -165,7 +241,16 @@ function CrossLinearForm({ stable }: { stable: string }) {
       errors={error && (
         <Alert variant="destructive"><ShieldAlert className="h-4 w-4" /><AlertDescription>{error}</AlertDescription></Alert>
       )}
-      result={result && <CrossResultView result={result} />}
+      result={result && (
+        <CrossResultView
+          result={result}
+          hasSL={hasSL}
+          directionLabel={sideLabel(direction)}
+          currencyLabel={currency.trim() || stable}
+          positionIdLabel={positionId.trim() || "—"}
+          stopLossPrice={stopLoss}
+        />
+      )}
     />
   )
 }
@@ -202,6 +287,12 @@ function CrossCoinMForm() {
   const [time, setTime] = useState("")
   const [positions, setPositions] = useState<CoinMPosState[]>([])
   const [walletAssets, setWalletAssets] = useState<CoinMWalletState[]>([])
+  const [currency, setCurrency] = useState("")
+  const [leverage, setLeverage] = useState("")
+  const [direction, setDirection] = useState<Side>("long")
+  const [positionId, setPositionId] = useState("")
+  const [hasSL, setHasSL] = useState(false)
+  const [stopLoss, setStopLoss] = useState("")
   const [result, setResult] = useState<CrossCoinMResult | null>(null)
   const [error, setError] = useState("")
   const posIdRef = useRef(0)
@@ -292,6 +383,20 @@ function CrossCoinMForm() {
     <ToolLayout
       form={
         <>
+          <PositionInfoCard
+            currency={currency}
+            onCurrencyChange={setCurrency}
+            leverage={leverage}
+            onLeverageChange={setLeverage}
+            direction={direction}
+            onDirectionChange={setDirection}
+            positionId={positionId}
+            onPositionIdChange={setPositionId}
+            hasSL={hasSL}
+            onHasSLChange={setHasSL}
+            stopLoss={stopLoss}
+            onStopLossChange={setStopLoss}
+          />
           <SectionCard title={t.time.section.title} description={t.time.section.description} icon={<Clock className="h-4 w-4" />}>
             <div className="grid grid-cols-2 gap-3">
               <FormField label={t.time.fields.date.label}><Input type="date" value={date} onChange={e => setDate(e.target.value)} /></FormField>
@@ -402,14 +507,39 @@ function CrossCoinMForm() {
       errors={error && (
         <Alert variant="destructive"><ShieldAlert className="h-4 w-4" /><AlertDescription>{error}</AlertDescription></Alert>
       )}
-      result={result && <CrossResultView result={result} />}
+      result={result && (
+        <CrossResultView
+          result={result}
+          hasSL={hasSL}
+          directionLabel={sideLabel(direction)}
+          currencyLabel={currency.trim() || "USDT"}
+          positionIdLabel={positionId.trim() || "—"}
+          stopLossPrice={stopLoss}
+        />
+      )}
     />
   )
 }
 
-function CrossResultView({ result }: { result: CrossResult }) {
+interface CrossResultViewProps {
+  result: CrossResult
+  hasSL?: boolean
+  directionLabel?: string
+  currencyLabel?: string
+  positionIdLabel?: string
+  stopLossPrice?: string
+}
+
+function CrossResultView({ result, hasSL = false, directionLabel = "—", currencyLabel = "—", positionIdLabel = "—", stopLossPrice = "" }: CrossResultViewProps) {
   const t = crossTexts.result
   const liqDt = result.liquidationDate
+
+  const slNum = parseFloat(stopLossPrice)
+  const hasSlPrice = hasSL && !!slNum
+  const stopLossLabel = hasSlPrice ? fmt(slNum, 6) : "—"
+  const slProximityText = hasSlPrice
+    ? result.marginRatio > 70 ? commonTexts.slProximityClose : commonTexts.slProximityFar
+    : ""
   const pct = Math.min(result.marginRatio / 200 * 100, 100)
   const barColor = result.marginRatio >= 100 ? "danger" : result.marginRatio > 70 ? "warning" : "success"
   const isCoinM = result.isCoinM
@@ -552,8 +682,11 @@ function CrossResultView({ result }: { result: CrossResult }) {
       </Card>
 
       <TemplateCards
-        variant="cross"
+        variant={hasSL ? "crossSL" : "cross"}
         params={{
+          direction: directionLabel,
+          currency: currencyLabel,
+          positionId: positionIdLabel,
           verdict: result.liquidated ? "liquidated" : "not liquidated",
           time: liqDt.toUTCString(),
           wallet: walletDisplay,
@@ -562,6 +695,7 @@ function CrossResultView({ result }: { result: CrossResult }) {
           mm: `${fmt(result.totalMM)} USDT`,
           ratio: `${fmt(result.marginRatio)}%`,
           count: String(result.positions.length),
+          ...(hasSL ? { stopLoss: stopLossLabel, slProximityText } : {}),
         }}
       />
     </div>

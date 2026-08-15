@@ -13,8 +13,10 @@ import { BreakdownPanel, BreakdownRow } from "@/components/shared/Breakdown"
 import { TemplateCards } from "@/components/shared/TemplateCards"
 import { ToolLayout } from "@/components/shared/ToolLayout"
 import { SideField } from "@/components/shared/SideField"
-import { isoTexts } from "@/lib/texts"
-import { calcIsoLinearMarginOk, calcIsoCoinMMarginOk, type IsoLinearInputs, type IsoCoinMInputs, fmt, type Side, sideLabel } from "@/lib/calculators"
+import { PositionInfoFields } from "@/components/shared/PositionInfoFields"
+import { CheckboxField } from "@/components/shared/CheckboxField"
+import { isoTexts, commonTexts } from "@/lib/texts"
+import { calcIsoLinearMarginOk, calcIsoCoinMMarginOk, type IsoLinearInputs, type IsoCoinMInputs, fmt, type Side, sideLabel, stopLossProximity } from "@/lib/calculators"
 import {
   Calculator,
   ShieldAlert,
@@ -57,6 +59,10 @@ function IsoLinearForm({ side }: { side: "USDT" | "USDC" }) {
   const [mmr, setMmr] = useState("")
   const [lev, setLev] = useState("")
   const [margin, setMargin] = useState("")
+  const [currency, setCurrency] = useState<string>(side)
+  const [positionId, setPositionId] = useState("")
+  const [hasSL, setHasSL] = useState(false)
+  const [stopLoss, setStopLoss] = useState("")
   const [result, setResult] = useState<ReturnType<typeof calcIsoLinearMarginOk> | null>(null)
   const [error, setError] = useState("")
 
@@ -91,29 +97,59 @@ function IsoLinearForm({ side }: { side: "USDT" | "USDC" }) {
   const sl = sideLabel(sideType)
   const resultBlock = result?.result
 
+  const slNum = parseFloat(stopLoss)
+  const hasSlPrice = hasSL && !!slNum
+  const stopLossLabel = hasSlPrice ? fmt(slNum, 6) : "—"
+  const slProximityText =
+    hasSlPrice && resultBlock
+      ? stopLossProximity(parseFloat(entry), resultBlock.liquidationPrice, slNum) === "close"
+        ? commonTexts.slProximityClose
+        : commonTexts.slProximityFar
+      : ""
+
   return (
     <ToolLayout
       form={
         <SectionCard title={t.section.title} description={t.section.description} icon={<ArrowDownUp className="h-4 w-4" />}>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-            <SideField value={sideType} onChange={(v) => setSideType(v)} />
-            <FormField label={t.fields.entry.label}>
-              <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.size.label} hint={t.fields.size.hint}>
-              <Input type="number" step="any" placeholder={t.fields.size.placeholder} value={size} onChange={e => setSize(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.mmr.label} hint={t.fields.mmr.hint}>
-              <Input type="number" step="any" placeholder={t.fields.mmr.placeholder} value={mmr} onChange={e => setMmr(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.leverage.label} hint={t.fields.leverage.hint}>
-              <Input type="number" step="any" placeholder={t.fields.leverage.placeholder} value={lev} onChange={e => setLev(e.target.value)} />
-            </FormField>
-            <FormField label={marginField.label} hint={marginField.hint}>
-              <Input type="number" step="any" placeholder={marginField.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
-            </FormField>
+          <div className="space-y-4">
+            <PositionInfoFields
+              currency={currency}
+              onCurrencyChange={setCurrency}
+              leverage={lev}
+              onLeverageChange={setLev}
+              direction={sideType}
+              onDirectionChange={setSideType}
+              positionId={positionId}
+              onPositionIdChange={setPositionId}
+              showDirection={false}
+              showLeverage={false}
+            />
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+              <SideField value={sideType} onChange={(v) => setSideType(v)} />
+              <FormField label={t.fields.entry.label}>
+                <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.size.label} hint={t.fields.size.hint}>
+                <Input type="number" step="any" placeholder={t.fields.size.placeholder} value={size} onChange={e => setSize(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.mmr.label} hint={t.fields.mmr.hint}>
+                <Input type="number" step="any" placeholder={t.fields.mmr.placeholder} value={mmr} onChange={e => setMmr(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.leverage.label} hint={t.fields.leverage.hint}>
+                <Input type="number" step="any" placeholder={t.fields.leverage.placeholder} value={lev} onChange={e => setLev(e.target.value)} />
+              </FormField>
+              <FormField label={marginField.label} hint={marginField.hint}>
+                <Input type="number" step="any" placeholder={marginField.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
+              </FormField>
+            </div>
+            <CheckboxField checked={hasSL} onChange={setHasSL} label={commonTexts.stopLossQuestion} />
+            {hasSL && (
+              <FormField label={commonTexts.stopLossPrice}>
+                <Input type="number" step="any" placeholder={commonTexts.stopLossPricePlaceholder} value={stopLoss} onChange={e => setStopLoss(e.target.value)} />
+              </FormField>
+            )}
+            <InfoNote>{t.infoNote}</InfoNote>
           </div>
-          <InfoNote>{t.infoNote}</InfoNote>
         </SectionCard>
       }
       action={
@@ -196,10 +232,12 @@ function IsoLinearForm({ side }: { side: "USDT" | "USDC" }) {
           </BreakdownPanel>
 
           <TemplateCards
-            variant="isoLinear"
+            variant={hasSL ? "isoLinearSL" : "isoLinear"}
             params={{
               side: sl,
+              direction: sl,
               market: `${side}-M`,
+              currency: currency.trim() || stable,
               entry: String(entry),
               size: `${size} coins`,
               mmr: `${mmr}%`,
@@ -209,6 +247,8 @@ function IsoLinearForm({ side }: { side: "USDT" | "USDC" }) {
               liq: resultBlock.liquidationPrice.toFixed(6),
               move: `${resultBlock.movePct}%`,
               leverage: resultBlock.leverageUsed ? `${resultBlock.leverageUsed}x` : "—",
+              positionId: positionId.trim() || "—",
+              ...(hasSL ? { stopLoss: stopLossLabel, slProximityText } : {}),
             }}
           />
         </div>
@@ -225,6 +265,10 @@ function IsoCoinMForm() {
   const [mmr, setMmr] = useState("")
   const [lev, setLev] = useState("")
   const [margin, setMargin] = useState("")
+  const [currency, setCurrency] = useState("")
+  const [positionId, setPositionId] = useState("")
+  const [hasSL, setHasSL] = useState(false)
+  const [stopLoss, setStopLoss] = useState("")
   const [result, setResult] = useState<ReturnType<typeof calcIsoCoinMMarginOk> | null>(null)
   const [error, setError] = useState("")
 
@@ -255,29 +299,59 @@ function IsoCoinMForm() {
   const sl = sideLabel(sideType)
   const resultBlock = result?.result
 
+  const slNum = parseFloat(stopLoss)
+  const hasSlPrice = hasSL && !!slNum
+  const stopLossLabel = hasSlPrice ? fmt(slNum, 6) : "—"
+  const slProximityText =
+    hasSlPrice && resultBlock
+      ? stopLossProximity(parseFloat(entry), resultBlock.liquidationPrice, slNum) === "close"
+        ? commonTexts.slProximityClose
+        : commonTexts.slProximityFar
+      : ""
+
   return (
     <ToolLayout
       form={
         <SectionCard title={t.section.title} description={t.section.description} icon={<ArrowDownUp className="h-4 w-4" />}>
-          <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-            <SideField value={sideType} onChange={(v) => setSideType(v)} />
-            <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
-              <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.entry.label}>
-              <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.mmr.label} hint={t.fields.mmr.hint}>
-              <Input type="number" step="any" placeholder={t.fields.mmr.placeholder} value={mmr} onChange={e => setMmr(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.leverage.label} hint={t.fields.leverage.hint}>
-              <Input type="number" step="any" placeholder={t.fields.leverage.placeholder} value={lev} onChange={e => setLev(e.target.value)} />
-            </FormField>
-            <FormField label={t.fields.margin.label} hint={t.fields.margin.hint}>
-              <Input type="number" step="any" placeholder={t.fields.margin.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
-            </FormField>
+          <div className="space-y-4">
+            <PositionInfoFields
+              currency={currency}
+              onCurrencyChange={setCurrency}
+              leverage={lev}
+              onLeverageChange={setLev}
+              direction={sideType}
+              onDirectionChange={setSideType}
+              positionId={positionId}
+              onPositionIdChange={setPositionId}
+              showDirection={false}
+              showLeverage={false}
+            />
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+              <SideField value={sideType} onChange={(v) => setSideType(v)} />
+              <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
+                <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.entry.label}>
+                <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.mmr.label} hint={t.fields.mmr.hint}>
+                <Input type="number" step="any" placeholder={t.fields.mmr.placeholder} value={mmr} onChange={e => setMmr(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.leverage.label} hint={t.fields.leverage.hint}>
+                <Input type="number" step="any" placeholder={t.fields.leverage.placeholder} value={lev} onChange={e => setLev(e.target.value)} />
+              </FormField>
+              <FormField label={t.fields.margin.label} hint={t.fields.margin.hint}>
+                <Input type="number" step="any" placeholder={t.fields.margin.placeholder} value={margin} onChange={e => setMargin(e.target.value)} />
+              </FormField>
+            </div>
+            <CheckboxField checked={hasSL} onChange={setHasSL} label={commonTexts.stopLossQuestion} />
+            {hasSL && (
+              <FormField label={commonTexts.stopLossPrice}>
+                <Input type="number" step="any" placeholder={commonTexts.stopLossPricePlaceholder} value={stopLoss} onChange={e => setStopLoss(e.target.value)} />
+              </FormField>
+            )}
+            <InfoNote>{t.infoNote}</InfoNote>
           </div>
-          <InfoNote>{t.infoNote}</InfoNote>
         </SectionCard>
       }
       action={
@@ -353,10 +427,12 @@ function IsoCoinMForm() {
           </BreakdownPanel>
 
           <TemplateCards
-            variant="isoCoinM"
+            variant={hasSL ? "isoCoinMSL" : "isoCoinM"}
             params={{
               side: sl,
+              direction: sl,
               market: "Coin-M",
+              currency: currency.trim() || "—",
               entry: String(entry),
               qty: `${qty} USD`,
               mmr: `${mmr}%`,
@@ -366,6 +442,8 @@ function IsoCoinMForm() {
               liq: resultBlock.liquidationPrice.toFixed(6),
               move: `${resultBlock.movePct}%`,
               leverage: resultBlock.leverageUsed ? `${resultBlock.leverageUsed}x` : "—",
+              positionId: positionId.trim() || "—",
+              ...(hasSL ? { stopLoss: stopLossLabel, slProximityText } : {}),
             }}
           />
         </div>

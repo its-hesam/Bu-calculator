@@ -31,3 +31,12 @@ export function sideLabel(side: Side): string {
 export function directionSide(dir: Direction): "long" | "short" {
   return dir === "LONG" ? "long" : "short"
 }
+
+export type StopLossProximity = "close" | "far"
+
+export function stopLossProximity(entry: number, liq: number, sl: number): StopLossProximity {
+  const move = Math.abs(entry - liq)
+  const dist = Math.abs(sl - liq)
+  if (move <= 0 || dist > move) return "far"
+  return dist / move <= 0.2 ? "close" : "far"
+}
