@@ -138,7 +138,7 @@ export function SlippageTab() {
             </BreakdownRow>
           </BreakdownPanel>
 
-          <div className="rounded-xl border border-success/20 bg-success/[0.05] p-4">
+          <div className="rounded-xl border border-success/20 bg-success/[0.05] p-5">
             <h4 className="mb-1.5 flex items-center gap-2 text-[13px] font-semibold text-success"><Info className="h-4 w-4" /> {t.about.heading}</h4>
             <p className="text-xs leading-relaxed text-muted-foreground">{t.about.paragraph1}</p>
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.about.paragraph2}</p>
@@ -147,20 +147,14 @@ export function SlippageTab() {
           <TemplateCards
             variant="slippage"
             params={{
-              direction: direction === "long" ? "LONG" : "SHORT",
-              currency: cur,
+              side: direction === "long" ? "LONG" : "SHORT",
+              pair: `${cur}USDT`,
               leverage: leverage.trim() ? `${leverage}x` : "—",
               positionId: positionId.trim() || "—",
-              entry: fmt(parseFloat(entry), 6),
-              stopLoss: fmt(parseFloat(stopLoss), 6),
-              actual: fmt(parseFloat(actual), 6),
-              size: `${size} coins`,
-              pnlAtSL: signed(result.pnlAtStopLoss),
-              pnlActual: signed(result.pnlAtActual),
-              slippagePnl: `${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)} ${cur}`,
-              slippage: `${fmt(result.slippagePct, 6)}%`,
-              priceDiff: `${fmt(result.priceDiff, 6)} ${cur}`,
-              diff: fmt(result.diff, 6),
+              closedPrice: fmt(parseFloat(actual), 6),
+              stopLossPrice: fmt(parseFloat(stopLoss), 6),
+              priceDiffFormula: `Price Difference = |Stop Loss − Actual Close| × Position Size = |${stopLoss} − ${actual}| × ${size} = ${fmt(result.priceDiff, 6)} ${cur}`,
+              pnlDiffFormula: `PnL Difference = PnL at Stop Loss − PnL at Actual Close = (${signed(result.pnlAtStopLoss)}) − (${signed(result.pnlAtActual)}) = ${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)} ${cur}`,
             }}
           />
         </div>

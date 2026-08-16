@@ -1,62 +1,121 @@
 import { vipFees } from "./shared"
 
-export interface TradingFeeLinearInputs {
+export type OrderType = "maker" | "taker"
+
+export interface FeeRow {
+  time: string
+  price: number
+  qty: number
+  orderType: OrderType
+}
+
+export interface TradingFeeBaseInputs {
   vipLevel: number
-  entryType: "maker" | "taker"
-  exitType: "maker" | "taker"
-  size: number
-  entryPrice: number
-  exitPrice: number
+  entries: FeeRow[]
+  exits: FeeRow[]
+  hasFeeCard: boolean
+  grossPnl: number
+}
+
+export interface TradingFeeLinearInputs extends TradingFeeBaseInputs {
   stable: string
 }
 
-export interface TradingFeeCoinMInputs {
-  vipLevel: number
+export interface TradingFeeCoinMInputs extends TradingFeeBaseInputs {
   coinName: string
-  entryType: "maker" | "taker"
-  exitType: "maker" | "taker"
-  qtyUSD: number
-  openPrice: number
-  closePrice: number
 }
 
 export interface TradingFeeResult {
   vipLevel: number
-  makerRate: number
-  takerRate: number
-  entryFee: number
-  exitFee: number
-  total: number
-  entryType: string
-  exitType: string
-  entryRate: number
-  exitRate: number
-  coin?: string
-  stable?: string
+  baseMakerRate: number
+  baseTakerRate: number
+  effMakerRate: number
+  effTakerRate: number
+  hasFeeCard: boolean
+  entryFees: number[]
+  exitFees: number[]
+  totalEntryFee: number
+  totalExitFee: number
+  totalFee: number
+  grossPnl: number
+  netPnl: number
+  totalEntryValue: number
+  totalExitValue: number
   isCoinM: boolean
+  stable?: string
+  coin?: string
+}
+
+function rateFor(orderType: OrderType, maker: number, taker: number): number {
+  return orderType === "maker" ? maker : taker
 }
 
 export function calcTradingFeeLinear(input: TradingFeeLinearInputs): TradingFeeResult {
-  const { vipLevel, entryType, exitType, size, entryPrice, exitPrice, stable } = input
-  const [maker, taker] = vipFees[vipLevel]
-  const eR = entryType === "maker" ? maker : taker
-  const xR = exitType === "maker" ? maker : taker
-  const entryFee = entryPrice * size * eR / 100
-  const exitFee = exitPrice * size * xR / 100
-  const total = entryFee + exitFee
+  const { vipLevel, entries, exits, hasFeeCard, grossPnl, stable } = input
+  const [baseMaker, baseTaker] = vipFees[vipLevel]
+  const effMaker = hasFeeCard ? baseMaker / 2 : baseMaker
+  const effTaker = hasFeeCard ? baseTaker / 2 : baseTaker
 
-  return { vipLevel, makerRate: maker, takerRate: taker, entryFee, exitFee, total, entryType, exitType, entryRate: eR, exitRate: xR, stable, isCoinM: false }
+  const entryFees = entries.map(e => (e.price * e.qty * rateFor(e.orderType, effMaker, effTaker)) / 100)
+  const exitFees = exits.map(e => (e.price * e.qty * rateFor(e.orderType, effMaker, effTaker)) / 100)
+  const totalEntryValue = entries.reduce((s, e) => s + e.price * e.qty, 0)
+  const totalExitValue = exits.reduce((s, e) => s + e.price * e.qty, 0)
+  const totalEntryFee = entryFees.reduce((s, f) => s + f, 0)
+  const totalExitFee = exitFees.reduce((s, f) => s + f, 0)
+  const totalFee = totalEntryFee + totalExitFee
+
+  return {
+    vipLevel,
+    baseMakerRate: baseMaker,
+    baseTakerRate: baseTaker,
+    effMakerRate: effMaker,
+    effTakerRate: effTaker,
+    hasFeeCard,
+    entryFees,
+    exitFees,
+    totalEntryFee,
+    totalExitFee,
+    totalFee,
+    grossPnl,
+    netPnl: grossPnl - totalFee,
+    totalEntryValue,
+    totalExitValue,
+    isCoinM: false,
+    stable,
+  }
 }
 
 export function calcTradingFeeCoinM(input: TradingFeeCoinMInputs): TradingFeeResult {
-  const { vipLevel, coinName, entryType, exitType, qtyUSD, openPrice, closePrice } = input
-  const [maker, taker] = vipFees[vipLevel]
-  const eR = entryType === "maker" ? maker : taker
-  const xR = exitType === "maker" ? maker : taker
-  const openFee = (qtyUSD * eR / 100) / openPrice
-  const closeFee = (qtyUSD * xR / 100) / closePrice
-  const total = openFee + closeFee
-  const coin = coinName || "coin"
+  const { vipLevel, entries, exits, hasFeeCard, grossPnl, coinName } = input
+  const [baseMaker, baseTaker] = vipFees[vipLevel]
+  const effMaker = hasFeeCard ? baseMaker / 2 : baseMaker
+  const effTaker = hasFeeCard ? baseTaker / 2 : baseTaker
 
-  return { vipLevel, makerRate: maker, takerRate: taker, entryFee: openFee, exitFee: closeFee, total, entryType, exitType, entryRate: eR, exitRate: xR, coin, isCoinM: true }
+  const entryFees = entries.map(e => (e.qty * rateFor(e.orderType, effMaker, effTaker)) / 100 / e.price)
+  const exitFees = exits.map(e => (e.qty * rateFor(e.orderType, effMaker, effTaker)) / 100 / e.price)
+  const totalEntryValue = entries.reduce((s, e) => s + e.qty, 0)
+  const totalExitValue = exits.reduce((s, e) => s + e.qty, 0)
+  const totalEntryFee = entryFees.reduce((s, f) => s + f, 0)
+  const totalExitFee = exitFees.reduce((s, f) => s + f, 0)
+  const totalFee = totalEntryFee + totalExitFee
+
+  return {
+    vipLevel,
+    baseMakerRate: baseMaker,
+    baseTakerRate: baseTaker,
+    effMakerRate: effMaker,
+    effTakerRate: effTaker,
+    hasFeeCard,
+    entryFees,
+    exitFees,
+    totalEntryFee,
+    totalExitFee,
+    totalFee,
+    grossPnl,
+    netPnl: grossPnl - totalFee,
+    totalEntryValue,
+    totalExitValue,
+    isCoinM: true,
+    coin: coinName || "coin",
+  }
 }

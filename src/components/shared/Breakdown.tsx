@@ -32,7 +32,7 @@ const titleTones = {
 
 export function BreakdownRow({ icon, title, children, tone = "default", right }: BreakdownRowProps) {
   return (
-    <div className="p-4 sm:p-5">
+    <div className="p-5 sm:p-6">
       <div className="mb-2.5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {icon && <span className={cn("shrink-0", tone === "default" ? "text-primary" : titleTones[tone])}>{icon}</span>}

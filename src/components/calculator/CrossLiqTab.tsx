@@ -214,19 +214,19 @@ function CrossLinearForm({ stable }: { stable: string }) {
             {positions.map(p => (
               <RowPanel key={p.id} index={p.id} label={crossTexts.rowLabels.position} onRemove={() => removePosition(p.id)}>
                 <div className="grid grid-cols-2 gap-2">
-                  <FormField label={t.positions.fields.symbol.label}><Input className="h-9" placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => update(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
+                  <FormField label={t.positions.fields.symbol.label}><Input className="h-10" placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => update(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
                   <FormField label={t.positions.fields.side}>
                     <Select value={p.side} onValueChange={(v: Direction) => update(p.id, "side", v)}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="LONG">{commonTexts.side.longUpper}</SelectItem><SelectItem value="SHORT">{commonTexts.side.shortUpper}</SelectItem></SelectContent>
                     </Select>
                   </FormField>
-                  <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input className="h-9" type="number" step="any" value={p.size} onChange={e => update(p.id, "size", e.target.value)} /></FormField>
-                  <FormField label={t.positions.fields.entry}><Input className="h-9" type="number" step="any" value={p.entry} onChange={e => update(p.id, "entry", e.target.value)} /></FormField>
-                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input className="h-9" type="number" step="any" value={p.mmr} onChange={e => update(p.id, "mmr", e.target.value)} /></FormField>
-                  <FormField label={t.positions.fields.mark.label}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => update(p.id, "mark", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input className="h-10" type="number" step="any" value={p.size} onChange={e => update(p.id, "size", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.entry}><Input className="h-10" type="number" step="any" value={p.entry} onChange={e => update(p.id, "entry", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input className="h-10" type="number" step="any" value={p.mmr} onChange={e => update(p.id, "mmr", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.mark.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => update(p.id, "mark", e.target.value)} /></FormField>
                 </div>
-                <FormField label={t.positions.fields.fee.label} hint={t.positions.fields.fee.hint}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.fee.placeholder} value={p.fee} onChange={e => update(p.id, "fee", e.target.value)} /></FormField>
+                <FormField label={t.positions.fields.fee.label} hint={t.positions.fields.fee.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.fee.placeholder} value={p.fee} onChange={e => update(p.id, "fee", e.target.value)} /></FormField>
               </RowPanel>
             ))}
             {positions.length > 0 && (
@@ -421,22 +421,22 @@ function CrossCoinMForm() {
                 <div className="grid grid-cols-3 gap-2">
                   <FormField label={t.assets.fields.coin}>
                     <Select value={w.coin} onValueChange={(v: string) => onWalletCoinChange(w.id, v)}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {COIN_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         <SelectItem value="OTHER">{t.assets.otherOption}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormField>
-                  <FormField label={t.assets.fields.amount.label}><Input className="h-9" type="number" step="any" placeholder={t.assets.fields.amount.placeholder} value={w.amount} onChange={e => updateWallet(w.id, "amount", e.target.value)} /></FormField>
-                  <FormField label={t.assets.fields.rate.label} hint={t.assets.fields.rate.hint}><Input className="h-9" type="number" step="any" value={w.rate} disabled={w.coin === "USDT"} onChange={e => updateWallet(w.id, "rate", e.target.value)} /></FormField>
+                  <FormField label={t.assets.fields.amount.label}><Input className="h-10" type="number" step="any" placeholder={t.assets.fields.amount.placeholder} value={w.amount} onChange={e => updateWallet(w.id, "amount", e.target.value)} /></FormField>
+                  <FormField label={t.assets.fields.rate.label} hint={t.assets.fields.rate.hint}><Input className="h-10" type="number" step="any" value={w.rate} disabled={w.coin === "USDT"} onChange={e => updateWallet(w.id, "rate", e.target.value)} /></FormField>
                 </div>
                 {w.coin === "OTHER" && (
-                  <FormField label={t.assets.fields.customCoin.label}><Input className="h-9" placeholder={t.assets.fields.customCoin.placeholder} value={w.customCoin} onChange={e => updateWallet(w.id, "customCoin", e.target.value.toUpperCase())} /></FormField>
+                  <FormField label={t.assets.fields.customCoin.label}><Input className="h-10" placeholder={t.assets.fields.customCoin.placeholder} value={w.customCoin} onChange={e => updateWallet(w.id, "customCoin", e.target.value.toUpperCase())} /></FormField>
                 )}
                 {w.coin !== "USDT" && (
                   <FormField label={t.assets.fields.mark.label} hint={t.assets.fields.mark.hint}>
-                    <Input className="h-9" type="number" step="any" placeholder={t.assets.fields.mark.placeholder} value={w.manualMark} onChange={e => updateWallet(w.id, "manualMark", e.target.value)} />
+                    <Input className="h-10" type="number" step="any" placeholder={t.assets.fields.mark.placeholder} value={w.manualMark} onChange={e => updateWallet(w.id, "manualMark", e.target.value)} />
                   </FormField>
                 )}
                 <p className="text-[11px] text-muted-foreground">
@@ -464,33 +464,33 @@ function CrossCoinMForm() {
             {positions.map(p => (
               <RowPanel key={p.id} index={p.id} label={crossTexts.rowLabels.position} onRemove={() => removePosition(p.id)} accent={p.side === "LONG" ? "success" : "danger"}>
                 <div className="grid grid-cols-2 gap-2">
-                  <FormField label={t.positions.fields.symbol.label}><Input className="h-9" placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => updatePos(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
+                  <FormField label={t.positions.fields.symbol.label}><Input className="h-10" placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => updatePos(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
                   <FormField label={t.positions.fields.type}>
                     <Select value={p.type} onValueChange={(v: CoinMPosState["type"]) => updatePos(p.id, "type", v)}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="COIN-M">{commonTexts.stableTabs.coin}</SelectItem><SelectItem value="USDT-M">{commonTexts.stableTabs.usdt}</SelectItem><SelectItem value="USDC-M">{commonTexts.stableTabs.usdc}</SelectItem></SelectContent>
                     </Select>
                   </FormField>
                   <FormField label={t.positions.fields.side}>
                     <Select value={p.side} onValueChange={(v: Direction) => updatePos(p.id, "side", v)}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="LONG">{commonTexts.side.longUpper}</SelectItem><SelectItem value="SHORT">{commonTexts.side.shortUpper}</SelectItem></SelectContent>
                     </Select>
                   </FormField>
-                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.mmr.placeholder} value={p.mmr} onChange={e => updatePos(p.id, "mmr", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mmr.placeholder} value={p.mmr} onChange={e => updatePos(p.id, "mmr", e.target.value)} /></FormField>
                 </div>
                 {p.type === "COIN-M" ? (
                   <div className="grid grid-cols-2 gap-2">
-                    <FormField label={t.positions.fields.baseCoin.label}><Input className="h-9" placeholder={t.positions.fields.baseCoin.placeholder} value={p.baseCoin} onChange={e => updatePos(p.id, "baseCoin", e.target.value.toUpperCase())} /></FormField>
-                    <FormField label={t.positions.fields.qty.label} hint={t.positions.fields.qty.hint}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.qty.placeholder} value={p.qty} onChange={e => updatePos(p.id, "qty", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.entry.label}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entry} onChange={e => updatePos(p.id, "entry", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.mark.label}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => updatePos(p.id, "mark", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.baseCoin.label}><Input className="h-10" placeholder={t.positions.fields.baseCoin.placeholder} value={p.baseCoin} onChange={e => updatePos(p.id, "baseCoin", e.target.value.toUpperCase())} /></FormField>
+                    <FormField label={t.positions.fields.qty.label} hint={t.positions.fields.qty.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.qty.placeholder} value={p.qty} onChange={e => updatePos(p.id, "qty", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.entry.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entry} onChange={e => updatePos(p.id, "entry", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.mark.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => updatePos(p.id, "mark", e.target.value)} /></FormField>
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 gap-2">
-                    <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.size.placeholder} value={p.size} onChange={e => updatePos(p.id, "size", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.entry.label}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entryL} onChange={e => updatePos(p.id, "entryL", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.mark.label}><Input className="h-9" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.markL} onChange={e => updatePos(p.id, "markL", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.size.placeholder} value={p.size} onChange={e => updatePos(p.id, "size", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.entry.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entryL} onChange={e => updatePos(p.id, "entryL", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.mark.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.markL} onChange={e => updatePos(p.id, "markL", e.target.value)} /></FormField>
                   </div>
                 )}
               </RowPanel>
@@ -548,8 +548,10 @@ function CrossResultView({ result, hasSL = false, directionLabel = "—", curren
 
   const eqLabel = isCoinM ? `${fmt(result.equity)} USDT` : `${fmt(result.equity)} ${result.stable}`
   const mmLabel = isCoinM ? `${fmt(result.totalMM)} USDT` : `${fmt(result.totalMM)} ${result.stable}`
+  const mmDisplay = mmLabel
   const walletDisplay = isCoinM ? `${fmt(totalWalletUSDT)} USDT ${t.converted}` : `${fmt(result.walletBase)} ${result.stable}`
   const pnlDisplay = isCoinM ? `${result.totalPnl >= 0 ? "+" : ""}${fmt(result.totalPnl)} USDT` : `${result.totalPnl >= 0 ? "+" : ""}${fmt(result.totalPnl)} ${result.stable}`
+  const unit = isCoinM ? "USDT" : result.stable
 
   const gist = buildGist(result)
   const steps = buildSteps(result)
@@ -567,7 +569,7 @@ function CrossResultView({ result, hasSL = false, directionLabel = "—", curren
           : t.verdict.safe(liqDt.toUTCString(), mmLabel, fmt(result.marginRatio))}
       </VerdictBanner>
 
-      <div className="rounded-xl border border-border/80 bg-card p-4">
+      <div className="rounded-xl border border-border/80 bg-card p-5">
         <div className="mb-2 flex items-center justify-between text-xs">
           <span className="flex items-center gap-1.5 font-medium text-muted-foreground"><Scale className="h-3.5 w-3.5 text-primary" /> {t.marginRatio}</span>
           <span className={`font-mono font-semibold ${barColor === "danger" ? "text-destructive" : barColor === "warning" ? "text-warning" : "text-success"}`}>{fmt(result.marginRatio)}%</span>
@@ -687,14 +689,22 @@ function CrossResultView({ result, hasSL = false, directionLabel = "—", curren
           direction: directionLabel,
           currency: currencyLabel,
           positionId: positionIdLabel,
-          verdict: result.liquidated ? "liquidated" : "not liquidated",
+          verdict: result.liquidated ? "Liquidated" : "Not Liquidated",
           time: liqDt.toUTCString(),
-          wallet: walletDisplay,
-          equity: `${fmt(result.equity)} USDT`,
-          pnl: pnlDisplay,
-          mm: `${fmt(result.totalMM)} USDT`,
+          walletDisplay,
+          pnlDisplay,
+          equityDisplay: `${fmt(result.equity)} ${unit}`,
+          mmDisplay,
           ratio: `${fmt(result.marginRatio)}%`,
+          walletNum: fmt(isCoinM ? totalWalletUSDT : result.walletBase),
+          pnlNum: fmt(result.totalPnl),
+          equityNum: fmt(result.equity),
+          mmNum: fmt(result.totalMM),
+          unit,
           count: String(result.positions.length),
+          verdictDetail: result.liquidated
+            ? `Your account was liquidated because the combined unrealized losses consumed the wallet equity. Total equity (${eqLabel}) fell to or below the required maintenance margin (${mmLabel}), pushing the margin ratio to ${fmt(result.marginRatio)}%. The exchange force-closed all cross margin positions to prevent a negative balance.`
+            : `Your account was not liquidated at this timestamp. Total equity (${eqLabel}) exceeded the required maintenance margin (${mmLabel}), keeping the margin ratio below 100%.`,
           ...(hasSL ? { stopLoss: stopLossLabel, slProximityText } : {}),
         }}
       />

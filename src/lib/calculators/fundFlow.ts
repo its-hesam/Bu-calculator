@@ -7,87 +7,114 @@ export interface FundFlowRow {
   currency: string
   contract: string
   amount: number
+  timeKey: number
+  parsed: boolean
 }
 
-export interface ReconstructedRow {
+export interface ProcessedRow {
   time: string
   type: string
   currency: string
   contract: string
   amount: number
-  balance: number
+  balanceBefore: number
+  balanceAfter: number
 }
 
 export interface FundFlowInputs {
-  file1: File | null
-  file2: File | null
+  files: File[]
   frozen: number
   available: number
 }
 
 export interface FundFlowResult {
-  rows: ReconstructedRow[]
-  currentBalance: number
-  oldestBalance: number
+  rows: ProcessedRow[]
   txCount: number
-  latestTx: ReconstructedRow
+  fileCount: number
+  rawCount: number
+  duplicateCount: number
+  unparsedCount: number
+  oldestBalance: number
+  currentBalance: number
+  finalBalance: number
+  netChange: number
+  reconciled: boolean
+  balanceDiff: number
+  currencies: string[]
   reportText: string
 }
 
 export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFlowResult> {
-  const rows1 = input.file1 ? await readExcel(input.file1) : []
-  const rows2 = input.file2 ? await readExcel(input.file2) : []
-  const merged = [...rows1, ...rows2]
-
-  if (merged.length === 0) {
+  const files = (input.files || []).filter(Boolean)
+  if (files.length === 0) {
     throw new Error(fundflowTexts.errors.noFile)
   }
 
-  let rows = normalizeRows(merged)
-  rows = sortRows(rows)
+  const fileArrays = await Promise.all(files.map(readExcel))
+  const rawCount = fileArrays.reduce((s, a) => s + a.length, 0)
+  const normalized = fileArrays.flat().map(normalizeRow)
+  const { unique, removed } = dedupRows(normalized)
+  const unparsedCount = unique.filter(r => !r.parsed).length
 
-  const frozen = input.frozen || 0
-  const available = input.available || 0
-  let balance = frozen + available
-  const startBalance = balance
+  if (unique.length === 0) {
+    throw new Error(fundflowTexts.errors.noValid)
+  }
 
-  const reconstructed: ReconstructedRow[] = []
+  const sorted = sortRows(unique)
+  const currencies = [...new Set(sorted.map(r => r.currency))]
 
-  rows.forEach((row) => {
-    balance = Number((balance - row.amount).toFixed(8))
-    reconstructed.push({
-      time: convertUTC8(row.time),
-      type: row.type,
-      currency: row.currency,
-      contract: row.contract || "-",
-      amount: row.amount,
-      balance,
+  const currentBalance = (input.frozen || 0) + (input.available || 0)
+
+  let b = currentBalance
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    b = Number((b - sorted[i].amount).toFixed(8))
+  }
+  const oldestBalance = b
+
+  const rows: ProcessedRow[] = []
+  let balance = oldestBalance
+  for (const r of sorted) {
+    const before = Number(balance.toFixed(8))
+    balance = Number((balance + r.amount).toFixed(8))
+    rows.push({
+      time: convertUTC8(r.time),
+      type: r.type,
+      currency: r.currency,
+      contract: r.contract || "-",
+      amount: r.amount,
+      balanceBefore: before,
+      balanceAfter: balance,
     })
+  }
+
+  const finalBalance = rows.length ? rows[rows.length - 1].balanceAfter : currentBalance
+  const balanceDiff = Number((currentBalance - finalBalance).toFixed(8))
+  const reconciled = Math.abs(balanceDiff) < 0.00000001
+  const netChange = Number((currentBalance - oldestBalance).toFixed(8))
+
+  const reportText = generateReport({
+    finalBalance,
+    txCount: rows.length,
+    fileCount: files.length,
+    duplicateCount: removed,
+    oldest: oldestBalance,
+    netChange,
   })
 
-  const latestTx = reconstructed[0] || {
-    time: "N/A", type: "N/A", currency: "USDT", contract: "-", amount: 0, balance: 0,
-  }
-  const finalOldest = reconstructed[reconstructed.length - 1]?.balance ?? balance
-
-  const reportText = generateReport(
-    startBalance,
-    balance,
-    rows.length,
-    {
-      time: rows[0]?.time ?? "",
-      type: rows[0]?.type ?? "N/A",
-      amount: rows[0]?.amount ?? 0,
-    },
-    finalOldest,
-  )
-
   return {
-    rows: reconstructed,
-    currentBalance: startBalance,
-    oldestBalance: balance,
+    rows,
     txCount: rows.length,
-    latestTx: latestTx as ReconstructedRow,
+    fileCount: files.length,
+    rawCount,
+    duplicateCount: removed,
+    unparsedCount,
+    oldestBalance,
+    currentBalance,
+    finalBalance,
+    netChange,
+    reconciled,
+    balanceDiff,
+    currencies,
     reportText,
   }
 }
@@ -111,20 +138,46 @@ function readExcel(file: File): Promise<Record<string, unknown>[]> {
   })
 }
 
-function normalizeRows(rows: Record<string, unknown>[]): FundFlowRow[] {
-  return rows.map((r) => ({
-    time: String((r["时间"] as string) ?? (r["Time"] as string) ?? (r["Transaction Time"] as string) ?? ""),
+function normalizeRow(r: Record<string, unknown>): FundFlowRow {
+  const rawTime = String(
+    (r["时间"] as string) ?? (r["Time"] as string) ?? (r["Transaction Time"] as string) ?? "",
+  )
+  const timeKey = parseTime(rawTime)
+  return {
+    time: rawTime,
     type: String((r["类型"] as string) ?? (r["Type"] as string) ?? "Unknown"),
-    currency: String((r["币种"] as string) ?? (r["Currency"] as string) ?? "USDT"),
+    currency: String((r["币种"] as string) ?? (r["Currency"] as string) ?? "USDT").toUpperCase(),
     contract: String((r["合约"] as string) ?? (r["Contract"] as string) ?? ""),
     amount: parseFloat(String((r["金额"] as string) ?? (r["Amount"] as string) ?? "").replace(/,/g, "")) || 0,
-  }))
+    timeKey: timeKey ?? 0,
+    parsed: timeKey !== null,
+  }
+}
+
+function parseTime(dateStr: string): number | null {
+  if (!dateStr) return null
+  const d = new Date(dateStr.replace(" ", "T"))
+  return isNaN(d.getTime()) ? null : d.getTime()
+}
+
+function dedupRows(rows: FundFlowRow[]): { unique: FundFlowRow[]; removed: number } {
+  const seen = new Set<string>()
+  const unique: FundFlowRow[] = []
+  for (const r of rows) {
+    const key = `${r.time.trim()}|${r.type.trim()}|${r.currency.toUpperCase()}|${r.contract.trim()}|${r.amount}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    unique.push(r)
+  }
+  return { unique, removed: rows.length - unique.length }
 }
 
 function sortRows(rows: FundFlowRow[]): FundFlowRow[] {
-  return rows.sort(
-    (a, b) => new Date(b.time.replace(" ", "T")).getTime() - new Date(a.time.replace(" ", "T")).getTime(),
-  )
+  return rows.sort((a, b) => {
+    const ak = a.parsed ? a.timeKey : Number.POSITIVE_INFINITY
+    const bk = b.parsed ? b.timeKey : Number.POSITIVE_INFINITY
+    return ak - bk
+  })
 }
 
 function convertUTC8(dateStr: string): string {
@@ -135,26 +188,31 @@ function convertUTC8(dateStr: string): string {
   return d.toISOString().replace("T", " ").slice(0, 19) + " UTC+8"
 }
 
-function generateReport(
-  current: number,
-  oldest: number,
-  txCount: number,
-  latestTx: { time: string; type: string; amount: number },
-  _finalOldest: number,
-): string {
+function generateReport(data: { finalBalance: number; txCount: number; fileCount: number; duplicateCount: number; oldest: number; netChange: number }): string {
   return fundflowTexts.report({
-    current: current.toFixed(4),
-    txCount,
-    latestType: latestTx.type || "N/A",
-    latestAmount: String(latestTx.amount || 0),
-    latestTime: convertUTC8(latestTx.time),
-    oldest: oldest.toFixed(4),
+    finalBalance: data.finalBalance.toFixed(4),
+    txCount: data.txCount,
+    fileCount: data.fileCount,
+    duplicateCount: data.duplicateCount,
+    oldest: data.oldest.toFixed(4),
+    netChange: data.netChange.toFixed(4),
   })
 }
 
-export function exportToExcel(rows: ReconstructedRow[]): void {
-  const ws = XLSX.utils.json_to_sheet(rows)
+export function exportToExcel(rows: ProcessedRow[]): void {
+  const ex = fundflowTexts.export
+  const data = rows.map((r, i) => ({
+    [ex.colIndex]: i + 1,
+    [ex.colTime]: r.time,
+    [ex.colType]: r.type,
+    [ex.colCurrency]: r.currency,
+    [ex.colContract]: r.contract,
+    [ex.colAmount]: r.amount,
+    [ex.colBefore]: r.balanceBefore,
+    [ex.colAfter]: r.balanceAfter,
+  }))
+  const ws = XLSX.utils.json_to_sheet(data)
   const wb = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(wb, ws, fundflowTexts.export.sheetName)
-  XLSX.writeFile(wb, fundflowTexts.export.fileName)
+  XLSX.utils.book_append_sheet(wb, ws, ex.sheetName)
+  XLSX.writeFile(wb, ex.fileName)
 }

@@ -30,21 +30,25 @@ const valueClasses: Record<Tone, string> = {
 
 export function ResultHero({ eyebrow, title, value, sub, tone = "primary", className }: ResultHeroProps) {
   return (
-    <div className={cn("overflow-hidden rounded-xl border border-border/80 bg-card", className)}>
-      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3">
+    <div className={cn("relative overflow-hidden rounded-2xl border border-border/80 bg-card", className)}>
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 px-6 py-3.5">
         {eyebrow ? (
-          <span className="eyebrow truncate">{eyebrow}</span>
+          <span className="flex min-w-0 items-center gap-2 truncate">
+            <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dotClasses[tone])} />
+            <span className="eyebrow truncate">{eyebrow}</span>
+          </span>
         ) : (
           <span />
         )}
         <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", dotClasses[tone])} />
       </div>
-      <div className="px-5 py-5 sm:px-6">
-        <h3 className="text-[13px] font-medium text-muted-foreground">{title}</h3>
-        <div className={cn("mt-1.5 font-mono text-3xl font-semibold tracking-tight tabular-nums sm:text-4xl", valueClasses[tone])}>
+      <div className="px-6 py-6 sm:px-7">
+        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+        <div className={cn("mt-2 font-mono text-4xl font-semibold tracking-tight tabular-nums sm:text-5xl", valueClasses[tone])}>
           {value}
         </div>
-        {sub && <div className="mt-2 text-sm leading-relaxed text-muted-foreground">{sub}</div>}
+        {sub && <div className="mt-3 text-sm leading-relaxed text-muted-foreground">{sub}</div>}
       </div>
     </div>
   )

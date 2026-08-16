@@ -67,81 +67,81 @@ export type TemplateVariant =
 export const templates: Record<TemplateVariant, { colleague: string; user: string }> = {
   isoLinear: {
     colleague:
-      "Internal Note — Isolated Position Liquidation Assessment\n\nPosition: {{direction}} {{market}} ({{currency}}), entry {{entry}}, size {{size}}, MMR {{mmr}}.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Position Liquidation Assessment\n\nPosition: {{direction}} {{market}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nEntry: {{entry}} · Size: {{size}} · MMR: {{mmr}}\nAvailable Margin: {{margin}} {{stable}}\nMaintenance Margin: {{mm}} {{stable}}\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nMaintenance Margin = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nWe have reviewed your {{direction}} {{market}} ({{currency}}) position. Based on the parameters provided, the estimated liquidation price is {{liq}}.\n\nThe position may be subject to forced closure should the price move {{move}} to reach {{liq}}. We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} {{market}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{size}}\nEntry Price: {{entry}} {{stable}}\nAvailable Margin: {{margin}} {{stable}}\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nThe estimated liquidation price for your position is {{liq}}, which represents a {{move}} price move {{belowAbove}} your entry price of {{entry}} {{stable}}.\n\nCalculation Steps:\nMaintenance Margin = Position Size × Entry Price × MMR = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nIf the market price reaches {{liq}}, your position may be subject to forced closure. We kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   isoLinearSL: {
     colleague:
-      "Internal Note — Isolated Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} {{market}} ({{currency}}), entry {{entry}}, size {{size}}, MMR {{mmr}}.\nStop Loss price: {{stopLoss}}.\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} {{market}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nEntry: {{entry}} · Size: {{size}} · MMR: {{mmr}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} {{stable}}\nMaintenance Margin: {{mm}} {{stable}}\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nMaintenance Margin = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nWe have reviewed your {{direction}} {{market}} ({{currency}}) position. As the position had a Stop Loss in place, it was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}). We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} {{market}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{size}}\nEntry Price: {{entry}} {{stable}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} {{stable}}\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}).\n\nCalculation Steps:\nMaintenance Margin = Position Size × Entry Price × MMR = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nWe kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   isoCoinM: {
     colleague:
-      "Internal Note — Isolated Coin-M Position Liquidation Assessment\n\nPosition: {{direction}} Coin-M ({{currency}}), quantity {{qty}}, entry {{entry}}, MMR {{mmr}}.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Coin-M Position Liquidation Assessment\n\nPosition: {{direction}} Coin-M ({{currency}})\nPOSITION ID: {{positionId}}\n\nQuantity: {{qty}} · Entry: {{entry}} · MMR: {{mmr}}\nAvailable Margin: {{margin}} coins\nMaintenance Margin: {{mm}} coins\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = AM − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nWe have reviewed your {{direction}} Coin-M ({{currency}}) position. Based on the parameters provided, the estimated liquidation price is {{liq}}.\n\nThe position may be subject to forced closure should the price move {{move}} to reach {{liq}}. We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} Coin-M ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: Coin-M\nQuantity Unit: {{qty}}\nEntry Price: {{entry}}\nAvailable Margin: {{margin}} coins\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nThe estimated liquidation price for your position is {{liq}}, which represents a {{move}} price move {{belowAbove}} your entry price of {{entry}}.\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = Available Margin − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nIf the market price reaches {{liq}}, your position may be subject to forced closure. We kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   isoCoinMSL: {
     colleague:
-      "Internal Note — Isolated Coin-M Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} Coin-M ({{currency}}), quantity {{qty}}, entry {{entry}}, MMR {{mmr}}.\nStop Loss price: {{stopLoss}}.\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it.\nAvailable margin {{margin}} · maintenance margin {{mm}} · risk buffer {{buffer}}.\nEstimated liquidation price {{liq}} — a {{move}} price move from entry (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Coin-M Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} Coin-M ({{currency}})\nPOSITION ID: {{positionId}}\n\nQuantity: {{qty}} · Entry: {{entry}} · MMR: {{mmr}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} coins\nMaintenance Margin: {{mm}} coins\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = AM − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nWe have reviewed your {{direction}} Coin-M ({{currency}}) position. As the position had a Stop Loss in place, it was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}). We kindly advise you to maintain sufficient margin in your account at all times.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} Coin-M ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: Coin-M\nQuantity Unit: {{qty}}\nEntry Price: {{entry}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} coins\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}).\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = Available Margin − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nWe kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   cross: {
     colleague:
-      "Internal Note — Cross Margin Assessment at {{time}}\n\nPosition: {{direction}} {{currency}} · Position ID {{positionId}}.\nVerdict: {{verdict}}.\n{{count}} position(s) · wallet {{wallet}} · unrealized PnL {{pnl}} · equity {{equity}}.\nMaintenance margin {{mm}} → margin ratio {{ratio}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Cross Margin Assessment at {{time}}\n\nPosition: {{direction}} {{currency}} · POSITION ID {{positionId}}\nVerdict: {{verdict}}\n\n{{count}} position(s) · Wallet {{walletDisplay}} · Unrealized PnL {{pnlDisplay}} · Equity {{equityDisplay}}\nMaintenance Margin {{mmDisplay}} → Margin Ratio {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nAt {{time}}, your cross-margin account was assessed as {{verdict}}. Your equity stood at {{equity}} against a maintenance margin of {{mm}}, resulting in a margin ratio of {{ratio}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed your cross-margin account.\n\nWe have thoroughly assessed your cross-margin account at {{time}} (UTC):\n\n**Cross Margin Assessment**\n**POSITION ID:** {{positionId}}\n\nVerdict: {{verdict}}\nWallet Balance: {{walletDisplay}}\nTotal Unrealized PnL: {{pnlDisplay}}\nTotal Equity: {{equityDisplay}}\nMaintenance Margin Required: {{mmDisplay}}\nMargin Ratio: {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = Maintenance Margin ÷ Equity × 100 = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{verdictDetail}}\n\nWe hope this detailed breakdown clarifies the assessment of your cross-margin account.",
   },
   crossSL: {
     colleague:
-      "Internal Note — Cross Margin Assessment (Stop Loss) at {{time}}\n\nPosition: {{direction}} {{currency}} · Position ID {{positionId}}.\nStop Loss price: {{stopLoss}}.\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\nVerdict: {{verdict}}.\n{{count}} position(s) · wallet {{wallet}} · unrealized PnL {{pnl}} · equity {{equity}}.\nMaintenance margin {{mm}} → margin ratio {{ratio}}.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Cross Margin Assessment (Stop Loss) at {{time}}\n\nPosition: {{direction}} {{currency}} · POSITION ID {{positionId}}\nStop Loss Price: {{stopLoss}}\nVerdict: {{verdict}}\n\n{{count}} position(s) · Wallet {{walletDisplay}} · Unrealized PnL {{pnlDisplay}} · Equity {{equityDisplay}}\nMaintenance Margin {{mmDisplay}} → Margin Ratio {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\nKindly review and confirm at your earliest convenience.",
     user:
-      "Dear Customer,\n\nAt {{time}}, your cross-margin account was assessed as {{verdict}}. Your equity stood at {{equity}} against a maintenance margin of {{mm}}, resulting in a margin ratio of {{ratio}}.\n\nAs your position had a Stop Loss in place, it was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed your cross-margin account.\n\nWe have thoroughly assessed your cross-margin account at {{time}} (UTC):\n\n**Cross Margin Assessment**\n**POSITION ID:** {{positionId}}\n\nVerdict: {{verdict}}\nWallet Balance: {{walletDisplay}}\nTotal Unrealized PnL: {{pnlDisplay}}\nTotal Equity: {{equityDisplay}}\nMaintenance Margin Required: {{mmDisplay}}\nMargin Ratio: {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = Maintenance Margin ÷ Equity × 100 = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{verdictDetail}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nWe hope this detailed breakdown clarifies the assessment of your cross-margin account.",
   },
   pnlLinear: {
     colleague:
-      "Internal Note — Realized PnL\n\n{{market}} {{direction}} position ({{currency}}) — entry {{open}}, exit {{close}}, quantity {{qty}}.\nRealized PnL: {{pnl}} · ROI {{roi}} (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
+      "Internal Note — Realized PnL Review\n\nPosition: {{market}} {{direction}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nSymbol: {{currency}}\nMarket: {{market}}\nDirection: {{direction}}\nPosition Size: {{qty}}\nEntry Price: {{open}}\nExit Price: {{close}}\n\n{{formula}}\n= {{expr}}\n= {{pnl}}\n\nROI: {{roi}} (leverage {{leverage}})\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour {{market}} {{direction}} ({{currency}}) trade has been closed with a realized PnL of {{pnl}}.\nEntry {{open}} → exit {{close}}, size {{qty}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{market}} {{direction}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{qty}}\nEntry Price: {{open}} {{stable}}\nExit Price: {{close}} {{stable}}\n\nYour realized PnL from the price movement:\n\n{{formula}}\n= {{expr}}\n= {{pnl}}\n\nTherefore, your {{direction}} trade resulted in a {{outcome}} of approximately {{pnlAbs}} {{stable}}.\n{{roiLine}}\n\nWe hope this detailed breakdown clarifies how your PnL was calculated.",
   },
   pnlCoinM: {
     colleague:
-      "Internal Note — Realized PnL (Coin-M)\n\nCoin-M {{direction}} position ({{currency}}) — entry {{open}}, exit {{close}}, quantity {{qty}}.\nRealized PnL {{pnl}} ≈ {{pnlUSD}} · ROI {{roi}} (leverage {{leverage}}).\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
+      "Internal Note — Realized PnL Review (Coin-M)\n\nPosition: Coin-M {{direction}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nQuantity Unit: {{qty}}\nEntry Price: {{open}}\nExit Price: {{close}}\n\n{{formula}}\n= {{expr}}\n= {{pnl}}\n≈ {{pnlUSD}}\n\nROI: {{roi}} (leverage {{leverage}})\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour Coin-M {{direction}} ({{currency}}) trade has been closed with a realized PnL of {{pnl}} (approximately {{pnlUSD}}).\nEntry {{open}} → exit {{close}}, size {{qty}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your Coin-M {{direction}} ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nQuantity Unit: {{qty}}\nEntry Price: {{open}}\nExit Price: {{close}}\n\nYour realized PnL from the price movement:\n\n{{formula}}\n= {{expr}}\n= {{pnl}} ({{coin}})\n≈ {{pnlUSD}}\n\nTherefore, your {{direction}} trade resulted in a {{outcome}} of approximately {{pnlUSD}}.\n{{roiLine}}\n\nWe hope this detailed breakdown clarifies how your PnL was calculated.",
   },
   feeLinear: {
     colleague:
-      "Internal Note — Trading Fee Breakdown\n\n{{market}} ({{currency}}) — {{direction}} position, {{vip}}, maker {{maker}} / taker {{taker}}.\nSize {{size}} · entry {{entry}} → exit {{exit}}.\nEntry fee {{entryFee}} · exit fee {{exitFee}} · total {{totalFee}}.\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
+      "Thank you very much for your patience while we reviewed the details of your position.\n\nWe have carefully checked the complete transaction history of your {{pair}} position. Please find the details below:\n\nSymbol: {{pair}} · Margin Mode: {{marginMode}} · Leverage: {{leverage}}\nDirection: {{direction}} · Position Size: {{totalSize}} {{currency}}\n\nYour gross realized PnL from the price movement was: {{grossPnl}}\n\nYour account is {{vip}}, and your applicable Futures fee rates are Maker {{maker}} / Taker {{taker}}.\n\nPlease note that opening and closing a position are two separate transactions, and each transaction is charged a trading fee separately.\n\nOpening Fee: {{entryFee}}\nClosing Fee: {{exitFee}}\nTotal Fees: {{totalFee}}\n\nTherefore, your final PnL was:\n{{grossPnl}} − {{totalFee}} = {{netPnl}}\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nFor your {{market}} ({{currency}}) {{direction}} trade (size {{size}}, entry {{entry}} → exit {{exit}}), the total trading fee is {{totalFee}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you very much for your patience while we reviewed the details of your position.\n\nWe have carefully checked the complete transaction history of your {{pair}} position. Please find the details below:\n\nSymbol: {{pair}} · Margin Mode: {{marginMode}} · Leverage: {{leverage}}\nDirection: {{direction}} · Position Size: {{totalSize}} {{currency}}\n\nYour gross realized PnL from the price movement was: {{grossPnl}}\n\nYour account is {{vip}}, and your applicable Futures fee rates are Maker {{maker}} / Taker {{taker}}.\n\nPlease note that opening and closing a position are two separate transactions, and each transaction is charged a trading fee separately.\n\nOpening Fee: {{entryFee}}\nClosing Fee: {{exitFee}}\nTotal Fees: {{totalFee}}\n\nTherefore, your final PnL was:\n{{grossPnl}} − {{totalFee}} = {{netPnl}}\n\nWe hope this detailed breakdown clarifies how your position, PnL, and trading fees were calculated.",
   },
   feeCoinM: {
     colleague:
-      "Internal Note — Trading Fee Breakdown (Coin-M)\n\n{{market}} ({{currency}}) — {{direction}} position, {{vip}}, maker {{maker}} / taker {{taker}}.\nQuantity {{qty}} · open {{open}} → close {{close}}.\nOpen fee {{openFee}} · close fee {{closeFee}} · total {{totalFee}}.\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
+      "Thank you very much for your patience while we reviewed the details of your position.\n\nWe have carefully checked the complete transaction history of your {{pair}} position. Please find the details below:\n\nSymbol: {{pair}} · Margin Mode: {{marginMode}} · Leverage: {{leverage}}\nDirection: {{direction}} · Position Size: {{totalSize}} {{currency}}\n\nYour gross realized PnL from the price movement was: {{grossPnl}}\n\nYour account is {{vip}}, and your applicable Futures fee rates are Maker {{maker}} / Taker {{taker}}.\n\nPlease note that opening and closing a position are two separate transactions, and each transaction is charged a trading fee separately.\n\nOpening Fee: {{entryFee}}\nClosing Fee: {{exitFee}}\nTotal Fees: {{totalFee}}\n\nTherefore, your final PnL was:\n{{grossPnl}} − {{totalFee}} = {{netPnl}}\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nFor your Coin-M ({{currency}}) {{direction}} trade (quantity {{qty}}, open {{open}} → close {{close}}), the total trading fee is {{totalFee}}, settled in {{currency}}.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you very much for your patience while we reviewed the details of your position.\n\nWe have carefully checked the complete transaction history of your {{pair}} position. Please find the details below:\n\nSymbol: {{pair}} · Margin Mode: {{marginMode}} · Leverage: {{leverage}}\nDirection: {{direction}} · Position Size: {{totalSize}} {{currency}}\n\nYour gross realized PnL from the price movement was: {{grossPnl}}\n\nYour account is {{vip}}, and your applicable Futures fee rates are Maker {{maker}} / Taker {{taker}}.\n\nPlease note that opening and closing a position are two separate transactions, and each transaction is charged a trading fee separately.\n\nOpening Fee: {{entryFee}}\nClosing Fee: {{exitFee}}\nTotal Fees: {{totalFee}}\n\nTherefore, your final PnL was:\n{{grossPnl}} − {{totalFee}} = {{netPnl}}\n\nWe hope this detailed breakdown clarifies how your position, PnL, and trading fees were calculated.",
   },
   funding: {
     colleague:
-      "Internal Note — Funding Fee\n\n{{direction}} {{currency}} position — size {{size}}, mark price {{mark}}, funding rate {{rate}}.\nFunding fee {{fee}}. Flow: {{flow}}.\nPosition ID: {{positionId}}.\n\nKindly review and confirm.",
+      "Internal Note — Funding Fee Review\n\nPosition: {{direction}} {{currency}} ({{sizeLabel}})\nPOSITION ID: {{positionId}}\n\nFunding Rate: {{rate}}\nMark Price: {{mark}} USDT\nPosition Size: {{sizeLabel}}\n\nFunding Fee = Size × Mark Price × Funding Rate\n= {{size}} × {{mark}} × {{rate}}%\n= {{fee}} USDT\n\nFlow: {{flow}}\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nYour {{direction}} {{currency}} position ({{size}}) is subject to a funding fee of {{fee}} at a rate of {{rate}}.\n\n{{flow}}\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience while we reviewed the funding fee applied to your position.\n\nWe have reviewed your {{direction}} {{currency}} position:\n\n**{{currency}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nPosition Size: {{sizeLabel}}\nMark Price: {{mark}} USDT\nFunding Rate: {{rate}}\n\nFunding Fee = Position Size × Mark Price × Funding Rate\n= {{size}} × {{mark}} × {{rate}}%\n= {{fee}} USDT\n\n{{flow}}\n\nWe hope this detailed breakdown clarifies how your funding fee was calculated.",
   },
   slippage: {
     colleague:
-      "Internal Note — Slippage Assessment (Stop Loss)\n\nPosition: {{direction}} {{currency}} · Position ID {{positionId}} · leverage {{leverage}}.\nEntry {{entry}}, stop loss {{stopLoss}}, actual close {{actual}} (size {{size}}).\nPnL at Stop Loss: {{pnlAtSL}} · PnL at actual close: {{pnlActual}}.\nSlippage {{slippage}} · price impact {{priceDiff}} · PnL impact {{slippagePnl}}.\n\nKindly review and confirm.",
+      "Thank you for your patience.\n\nWe completely understand how important this matter is to you.\n\nWe have thoroughly reviewed the position:\n\n**{{pair}}-Isolated-{{leverage}}x-{{side}}**\n**POSITION ID:** {{positionId}}\n**CLOSED AT:** {{closedPrice}}\n**Stop loss:** {{stopLossPrice}} (Market)\n\n{{priceDiffFormula}}\n\n{{pnlDiffFormula}}\n\nBased on our investigation, the stop loss order was configured as a Market order.\n\nWith market orders, once the trigger price is reached, the order is immediately executed at the best available price in the order book.\n\nAs a result, during periods of rapid price movement or sharp market fluctuations, a small difference between the trigger price and the final execution price may occur. This is a normal market behavior known as market fluctuation and does not indicate any issue with the system.\n\nThis means your stop loss was triggered correctly.\n\nHowever, due to the extremely rapid price movement at that moment, the difference between the trigger price and the final execution price is considered normal under such market conditions, as the order execution may be affected by the speed of the price movement.\n\nTherefore, there was no problem on the system side, and the order was executed according to the market conditions at that time.",
     user:
-      "Dear Customer,\n\nYour {{direction}} {{currency}} position (entry {{entry}}) had a Stop Loss at {{stopLoss}} to limit your loss. However, the position was actually closed at {{actual}} due to market conditions, resulting in a slippage of {{slippage}}.\n\nPnL at the Stop Loss price was {{pnlAtSL}}, while the PnL at the actual closing price was {{pnlActual}} — a slippage impact of {{slippagePnl}} on {{size}}.\n\nMinor differences between the displayed and executed price are considered normal for market orders.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Thank you for your patience.\n\nWe completely understand how important this matter is to you.\n\nWe have thoroughly reviewed the position:\n\n**{{pair}}-Isolated-{{leverage}}x-{{side}}**\n**POSITION ID:** {{positionId}}\n**CLOSED AT:** {{closedPrice}}\n**Stop loss:** {{stopLossPrice}} (Market)\n\nBased on our investigation, the stop loss order was configured as a Market order.\n\nWith market orders, once the trigger price is reached, the order is immediately executed at the best available price in the order book.\n\nAs a result, during periods of rapid price movement or sharp market fluctuations, a small difference between the trigger price and the final execution price may occur. This is a normal market behavior known as market fluctuation and does not indicate any issue with the system.\n\nThis means your stop loss was triggered correctly.\n\nHowever, due to the extremely rapid price movement at that moment, the difference between the trigger price and the final execution price is considered normal under such market conditions, as the order execution may be affected by the speed of the price movement.\n\nTherefore, there was no problem on the system side, and the order was executed according to the market conditions at that time.",
   },
   fundFlow: {
     colleague:
-      "Internal Note — Fund Flow Reconstruction\n\nReconstruction complete — {{count}} transactions.\nCurrent balance {{current}} · oldest reconstructed balance {{oldest}} · net change {{netChange}}.\n\nKindly review and confirm.",
+      "Internal Note — Fund Flow Reconstruction\n\nMerged {{fileCount}} file(s) · processed {{count}} transactions ({{duplicates}} duplicate(s) removed).\n\nFinal Available Balance: {{finalBalance}} USDT\nBalance at the oldest transaction: {{oldest}} USDT\nNet Change: {{netChange}} USDT\n\nThe account balance was reconstructed backwards from the current balance (Frozen + Available) and verified forward across the complete transaction history.\n\nKindly review and confirm.",
     user:
-      "Dear Customer,\n\nWe have reviewed the fund flow of your account across {{count}} transactions. Your current balance is {{current}}, and the reconstructed balance at the time of the oldest transaction is {{oldest}} (net change {{netChange}}).\n\nThe full breakdown is attached for your reference.\n\nShould you have any questions or require further assistance, please do not hesitate to contact our support team.",
+      "Dear Valued Customer,\n\nThank you for your patience.\n\nWe have carefully analyzed the complete transaction history of your Futures account.\n\nBased on the transaction history provided and the calculations performed, the available balance of your Futures account is **{{finalBalance}} USDT**.\n\nCalculation Summary:\n• Transactions Processed: {{count}}\n• Files Merged: {{fileCount}}\n• Duplicate Transactions Removed: {{duplicates}}\n• Balance at the oldest transaction: {{oldest}} USDT\n\nIf you have any questions about specific transactions, please do not hesitate to let us know.\n\nBest regards,\nCustomer Support Team",
   },
 }
 
@@ -609,25 +609,47 @@ export const pnlTexts = {
 }
 
 export const feeTexts = {
+  common: {
+    feeDeductionCard: "Did the user have a Fee Deduction Card?",
+    feeDeductionHint: "All applicable fee rates are divided by 2",
+    grossPnl: { label: "Gross Realized PnL (before fees)", hint: "USDT", placeholder: "e.g. 120.5" },
+    marginMode: { label: "Margin Mode", isolated: "Isolated", cross: "Cross" },
+    entries: {
+      section: "Entry Transactions",
+      add: "Add Entry",
+      addMore: "Add Entry",
+      empty: "No entries yet — click Add Entry to include one.",
+      fields: { time: { label: "Entry Time", placeholder: "e.g. 2024-01-01 10:00" }, price: { label: "Entry Price", placeholder: "e.g. 60000" }, qty: "Size", type: "Order Type" },
+    },
+    exits: {
+      section: "Exit Transactions",
+      add: "Add Exit",
+      addMore: "Add Exit",
+      empty: "No exits yet — click Add Exit to include one.",
+      fields: { time: { label: "Exit Time", placeholder: "e.g. 2024-01-01 14:00" }, price: { label: "Exit Price", placeholder: "e.g. 62000" }, qty: "Size", type: "Order Type" },
+    },
+    entryRow: "Entry",
+    exitRow: "Exit",
+  },
   linear: {
-    section: { title: "Fee Details", description: "VIP tier and order types drive the fee rate" },
+    section: { title: "Fee Details", description: "VIP tier, order types and Fee Deduction Card drive the fee rate" },
     fields: {
       vip: "VIP Level",
-      size: { label: "Position Size", hint: "coins", placeholder: "e.g. 2" },
-      entryType: "Entry Order Type",
-      exitType: "Exit Order Type",
-      entry: { label: "Entry Price", placeholder: "e.g. 60000" },
-      exit: { label: "Exit / Close Price", placeholder: "e.g. 62000" },
     },
     calculate: "Calculate Fees",
-    error: "Please fill all fields.",
+    error: "Please add at least one entry and one exit, and fill all fields.",
+    errorRows: "Please fill all fields for every entry and exit.",
+    errorPnl: "Please enter the gross realized PnL.",
     hero: { title: "Total Trading Fees" },
     eyebrow: (stable: string, vip: string) => `${stable}-M · VIP ${vip}`,
-    heroSub: (maker: string, taker: string) => `Maker ${maker}% · Taker ${taker}%`,
-    stats: { entry: "Entry Fee", exit: "Exit Fee", vip: "VIP Level", total: "Total Fees" },
+    heroSub: (maker: string, taker: string, feeCard: boolean) =>
+      `Maker ${maker}% · Taker ${taker}%${feeCard ? " · Fee Deduction Card (÷2)" : ""}`,
+    stats: { entry: "Total Entry Fee", exit: "Total Exit Fee", vip: "VIP Level", total: "Total Fees", netPnl: "Final PnL" },
     breakdown: {
-      entry: (type: string, rate: string) => `Entry Fee (${type} @ ${rate}%)`,
-      exit: (type: string, rate: string) => `Exit Fee (${type} @ ${rate}%)`,
+      entry: (count: number) => `Entry Fee${count > 1 ? `s (${count})` : ""}`,
+      exit: (count: number) => `Exit Fee${count > 1 ? `s (${count})` : ""}`,
+      fees: "Fee Rates",
+      summary: "Summary",
     },
     formulas: {
       entry: "Entry Price × Size × Rate%",
@@ -639,21 +661,21 @@ export const feeTexts = {
     fields: {
       vip: "VIP Level",
       coin: { label: "Coin / Pair Name", placeholder: "e.g. BTC, ETH, SOL" },
-      qty: { label: "Quantity Unit", hint: "USD", placeholder: "e.g. 10000" },
-      entryType: "Entry Order Type",
-      exitType: "Exit Order Type",
-      open: { label: "Open Price", placeholder: "e.g. 60000" },
-      close: { label: "Close Price", placeholder: "e.g. 62000" },
     },
     calculate: "Calculate Fees",
-    error: "Please fill all Coin-M fields.",
+    error: "Please add at least one entry and one exit, and fill all fields.",
+    errorRows: "Please fill all fields for every entry and exit.",
+    errorPnl: "Please enter the gross realized PnL.",
     hero: { title: "Total Trading Fee" },
     eyebrow: (vip: string) => `Coin-M · VIP ${vip}`,
-    heroSub: (coin: string, maker: string, taker: string) => `Settled in ${coin} · Maker ${maker}% · Taker ${taker}%`,
-    stats: { open: "Open Fee", close: "Close Fee", pair: "Pair", total: "Total Fee" },
+    heroSub: (coin: string, maker: string, taker: string, feeCard: boolean) =>
+      `Settled in ${coin} · Maker ${maker}% · Taker ${taker}%${feeCard ? " · Fee Deduction Card (÷2)" : ""}`,
+    stats: { open: "Total Open Fee", close: "Total Close Fee", pair: "Pair", total: "Total Fee", netPnl: "Final PnL" },
     breakdown: {
-      open: (type: string, rate: string, coin: string) => `Open Fee (${type} @ ${rate}%) — settled in ${coin}`,
-      close: (type: string, rate: string, coin: string) => `Close Fee (${type} @ ${rate}%) — settled in ${coin}`,
+      open: (count: number) => `Open Fee${count > 1 ? `s (${count})` : ""} — settled in the base coin`,
+      close: (count: number) => `Close Fee${count > 1 ? `s (${count})` : ""} — settled in the base coin`,
+      fees: "Fee Rates",
+      summary: "Summary",
     },
     formulas: {
       open: "(Qty USD × Rate%) ÷ Open Price",
@@ -734,11 +756,13 @@ export const slippageTexts = {
 }
 
 export const fundflowTexts = {
-  section: { title: "Excel Files & Balances", description: "Reconstruct a balance history from exported transaction files" },
+  section: { title: "Excel Files & Balances", description: "Merge, deduplicate and process the complete transaction history to determine the available balance" },
   files: {
-    file1: { label: "Excel File 1", hint: "required — transactions" },
-    file2: { label: "Excel File 2", hint: "optional" },
+    add: "Add File",
+    empty: "No files yet — click Add File to include one.",
+    label: "Transaction File",
     prompt: "Click to select (.xlsx, .xls)",
+    remove: "Remove",
   },
   fields: {
     frozen: "Frozen as Margin",
@@ -748,51 +772,72 @@ export const fundflowTexts = {
   scriptHeading: "Script",
   summaryHeading: "Summary",
   summary: {
-    current: "Current Balance",
-    oldest: "Oldest Balance",
+    finalBalance: "Final Available Balance",
     count: "Transactions",
+    files: "Files",
+    duplicates: "Duplicates Removed",
+    oldest: "Oldest Balance",
     netChange: "Net Change",
   },
   tableHeading: "Detailed Balance Reconstruction",
   table: {
+    index: "#",
     time: "Transaction Time (UTC+8)",
     type: "Type",
     currency: "Currency",
     contract: "Contract",
     amount: "Amount",
-    balance: "Reconstructed Balance",
+    before: "Balance Before",
+    after: "Balance After",
+  },
+  pageSize: 100,
+  pagination: {
+    prev: "Prev",
+    next: "Next",
   },
   download: "Download Excel",
   newCalculation: "New Calculation",
   errors: {
     noFile: "Please upload at least one file.",
+    noValid: "No valid transactions were found in the uploaded files.",
     readFailed: "Failed to read the selected file.",
     generic: "An unexpected error occurred. Please try again.",
+  },
+  warnings: {
+    unparsed: (count: number) =>
+      `${count} transaction(s) had an unreadable timestamp and were processed in file order at the end of the history. Please verify these entries.`,
+    reconcile: (diff: string) =>
+      `The reconstructed history differs from the entered balance by ${diff} USDT. Please double-check the uploaded files and the entered Available / Frozen balances.`,
+    currencies: (list: string) =>
+      `The files contain multiple currencies (${list}). Amounts are summed as-is without currency conversion.`,
   },
   export: {
     sheetName: "Reconstructed_Balance",
     fileName: "Balance_Reconstruction.xlsx",
+    colIndex: "#",
+    colTime: "Transaction Time (UTC+8)",
+    colType: "Type",
+    colCurrency: "Currency",
+    colContract: "Contract",
+    colAmount: "Amount",
+    colBefore: "Balance Before",
+    colAfter: "Balance After",
   },
-  report: (data: { current: string; txCount: number; latestType: string; latestAmount: string; latestTime: string; oldest: string }) => `
+  report: (data: { finalBalance: string; txCount: number; fileCount: number; duplicateCount: number; oldest: string; netChange: string }) => `
 Dear Valued Customer,
 
 Thank you for your patience.
 
-We have carefully analyzed your Futures account transaction history. Here is a clear summary:
+We have carefully analyzed the complete transaction history of your Futures account.
 
-<strong>Current Balance:</strong> ${data.current} USDT
+Based on the transaction history provided and the calculations performed, the available balance of your Futures account is <strong>${data.finalBalance} USDT</strong>.
+
+Calculation Summary:
 <strong>Total Transactions Processed:</strong> ${data.txCount}
-
-<strong>Latest Transaction:</strong>
-• Type: ${data.latestType}
-• Amount: ${data.latestAmount} USDT
-• Time: ${data.latestTime}
-
-<strong>Balance Reconstruction:</strong>
-We reconstructed your account balance by working backwards from your current balance (Frozen + Available).
-This method allows us to determine what your balance was at any point in the past based on the uploaded transaction records.
-
-Your balance at the time of the oldest transaction in the file was approximately <strong>${data.oldest} USDT</strong>.
+<strong>Files Merged:</strong> ${data.fileCount}
+<strong>Duplicate Transactions Removed:</strong> ${data.duplicateCount}
+<strong>Balance at the time of the oldest transaction:</strong> ${data.oldest} USDT
+<strong>Net Change:</strong> ${data.netChange} USDT
 
 If you have any questions about specific transactions or require further analysis, please do not hesitate to let us know.
 

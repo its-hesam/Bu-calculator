@@ -59,15 +59,14 @@ const TOOLS: Tool[] = appTexts.tools.map(tool => ({
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <Calculator className="h-4 w-4" />
+    <div className="flex items-center gap-3">
+      <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg shadow-primary/20 ring-1 ring-inset ring-white/10">
+        <Calculator className="h-4.5 w-4.5" />
       </div>
-      <div className="leading-none">
+      <div className="leading-tight">
         <div className="text-[15px] font-bold tracking-tight text-foreground">
-          {appTexts.brand.name} <span className="text-primary">{appTexts.brand.product}</span>
+          {appTexts.brand.name} <span className="text-gradient">{appTexts.brand.product}</span>
         </div>
-       
       </div>
     </div>
   )
@@ -79,15 +78,15 @@ function ToolButton({ tool, active, onSelect }: { tool: Tool; active: boolean; o
       onClick={onSelect}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "relative flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-[13px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+        "relative flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-[13px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
         active
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+          ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.28)]"
+          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
       )}
     >
       {tool.icon}
       <span className="truncate">{tool.label}</span>
-      {active && <span className="absolute inset-x-3 -bottom-[13px] h-px bg-primary" />}
+      {active && <span className="ml-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />}
     </button>
   )
 }
@@ -105,15 +104,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border/80 bg-background/90 backdrop-blur-lg">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+      <header className="relative sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:h-[4.5rem] lg:px-10">
           <Logo />
           <nav className="hidden flex-1 items-center gap-1 overflow-x-auto px-2 lg:flex scrollbar-none" aria-label="Tools">
             {TOOLS.map(t => (
               <ToolButton key={t.key} tool={t} active={active === t.key} onSelect={() => select(t.key)} />
             ))}
           </nav>
-        
+          <div className="ml-auto hidden items-center gap-2 font-mono text-xs text-muted-foreground lg:flex">
+            <span className="text-foreground/70">{String(toolIndex + 1).padStart(2, "0")}</span>
+            <span className="text-border">/</span>
+            <span>{String(TOOLS.length).padStart(2, "0")}</span>
+          </div>
           <Button variant="ghost" size="icon" className="h-9 w-9 lg:hidden" onClick={() => setDrawerOpen(true)} aria-label={appTexts.aria.openMenu}>
             <Menu className="h-5 w-5" />
           </Button>
@@ -139,9 +143,9 @@ export default function App() {
                     onClick={() => select(t.key)}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition-colors duration-200",
+                      "flex w-full items-center gap-3 rounded-full px-4 py-3 text-left text-sm font-medium transition-colors duration-200",
                       isActive
-                        ? "bg-primary/10 text-primary"
+                        ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.28)]"
                         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                     )}
                   >
@@ -157,19 +161,25 @@ export default function App() {
         </div>
       )}
 
-      <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 lg:pb-20 lg:pt-12">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">{tool.label}</h1>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{tool.description}</p>
+      <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-10 sm:px-6 lg:px-10 lg:pb-24 lg:pt-14">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-3xl">
+            <div className="flex items-center gap-2">
+              <span className="eyebrow">{appTexts.brand.name}</span>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="font-mono text-xs text-muted-foreground/70">{String(toolIndex + 1).padStart(2, "0")} / {String(TOOLS.length).padStart(2, "0")}</span>
+            </div>
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{tool.label}</h1>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">{tool.description}</p>
           </div>
-          <div className="hidden shrink-0 items-center gap-1 font-mono text-xs text-muted-foreground sm:flex">
-            <span className="text-foreground/70">{String(toolIndex + 1).padStart(2, "0")}</span>
-            <span className="text-border">/</span>
-            <span>{String(TOOLS.length).padStart(2, "0")}</span>
+          <div className="hidden shrink-0 items-center gap-2 sm:flex">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/[0.06] px-3.5 py-1.5 font-mono text-xs font-medium text-primary">
+              {tool.icon}
+              <span className="uppercase">{tool.key}</span>
+            </span>
           </div>
         </div>
-        <hr className="mt-6 border-t border-border/80 lg:mt-8" />
+        <div className="mt-8 h-px bg-gradient-to-r from-primary/40 via-border/80 to-transparent lg:mt-10" />
 
         <div className="mt-8 lg:mt-10">{tool.comp}</div>
       </main>

@@ -14,13 +14,13 @@ export function VerdictBanner({ ok, okTitle, dangerTitle, children, className }:
   return (
     <Card
       className={cn(
-        "relative overflow-hidden border-l-2",
+        "relative overflow-hidden rounded-2xl border-l-2",
         ok ? "border-l-success" : "border-l-destructive",
         className,
       )}
     >
-      <div className="p-5">
-        <div className="mb-2 flex items-center gap-2.5">
+      <div className="p-6">
+        <div className="mb-2.5 flex items-center gap-2.5">
           <span
             className={cn(
               "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",

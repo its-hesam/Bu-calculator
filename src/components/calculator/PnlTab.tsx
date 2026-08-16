@@ -133,11 +133,19 @@ function PnlLinearForm({ stable }: { stable: string }) {
               direction: side.toUpperCase(),
               market: `${stable}-M`,
               currency: currency.trim() || stable,
+              stable,
               open: String(openP),
               close: String(closeP),
               qty: `${qty} coins`,
+              formula: result.formulaText,
+              expr: side === "long"
+                ? `(${closeP} − ${openP}) × ${qty}`
+                : `(${openP} − ${closeP}) × ${qty}`,
               pnl: `${isProfit ? "+" : ""}${fmt(result.pnl, 6)} ${stable}`,
+              pnlAbs: fmt(Math.abs(result.pnl), 6),
+              outcome: isProfit ? "profit" : "loss",
               roi: result.roi !== undefined ? `${fmt(result.roi, 6)}%` : "—",
+              roiLine: result.roi !== undefined ? `This represents a return on investment (ROI) of ${fmt(result.roi, 6)}%.` : "",
               leverage: leverage.trim() ? `${leverage}x` : "—",
               positionId: positionId.trim() || "—",
             }}
@@ -264,9 +272,15 @@ function PnlCoinMForm() {
               open: String(openP),
               close: String(closeP),
               qty: `${qty} USD`,
+              formula: result.formulaText,
+              expr: side === "long"
+                ? `${qty} × (1/${openP} − 1/${closeP})`
+                : `${qty} × (1/${closeP} − 1/${openP})`,
               pnl: `${isProfit ? "+" : ""}${fmt(result.pnl, 6)} ${result.coinName}`,
               pnlUSD: `${isProfit ? "+" : ""}${fmt(result.pnlUSD ?? 0, 6)} USD`,
+              outcome: isProfit ? "profit" : "loss",
               roi: result.roi !== undefined ? `${fmt(result.roi, 6)}%` : "—",
+              roiLine: result.roi !== undefined ? `This represents a return on investment (ROI) of ${fmt(result.roi, 6)}%.` : "",
               leverage: leverage.trim() ? `${leverage}x` : "—",
               positionId: positionId.trim() || "—",
             }}
