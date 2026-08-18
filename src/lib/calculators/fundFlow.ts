@@ -156,8 +156,17 @@ function normalizeRow(r: Record<string, unknown>): FundFlowRow {
 
 function parseTime(dateStr: string): number | null {
   if (!dateStr) return null
-  const d = new Date(dateStr.replace(" ", "T"))
-  return isNaN(d.getTime()) ? null : d.getTime()
+  const s = String(dateStr).trim()
+  if (!s) return null
+  const d = new Date(s.replace(" ", "T"))
+  if (!isNaN(d.getTime())) return d.getTime()
+  const m = s.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/)
+  if (m) {
+    const [, y, mo, da, h = "0", mi = "0", se = "0"] = m
+    const t = new Date(+y, +mo - 1, +da, +h, +mi, +se).getTime()
+    if (!isNaN(t)) return t
+  }
+  return null
 }
 
 function dedupRows(rows: FundFlowRow[]): { unique: FundFlowRow[]; removed: number } {
@@ -173,7 +182,7 @@ function dedupRows(rows: FundFlowRow[]): { unique: FundFlowRow[]; removed: numbe
 }
 
 function sortRows(rows: FundFlowRow[]): FundFlowRow[] {
-  return rows.sort((a, b) => {
+  return [...rows].sort((a, b) => {
     const ak = a.parsed ? a.timeKey : Number.POSITIVE_INFINITY
     const bk = b.parsed ? b.timeKey : Number.POSITIVE_INFINITY
     return ak - bk

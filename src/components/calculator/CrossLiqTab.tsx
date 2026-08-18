@@ -19,7 +19,7 @@ import { TemplateCards } from "@/components/shared/TemplateCards"
 import { ToolLayout } from "@/components/shared/ToolLayout"
 import { PositionInfoFields } from "@/components/shared/PositionInfoFields"
 import { CheckboxField } from "@/components/shared/CheckboxField"
-import { crossTexts, commonTexts } from "@/lib/texts"
+import { crossTexts, commonTexts, mmrExplanationTexts } from "@/lib/texts"
 import {
   calcCrossLinear, calcCrossCoinM, buildGist, buildSteps, buildExplain,
   EXR_RATES, fmt, type CrossLinearResult, type CrossCoinMResult, type CrossResult,
@@ -69,6 +69,8 @@ interface PositionInfoCardProps {
   onHasSLChange: (v: boolean) => void
   stopLoss: string
   onStopLossChange: (v: string) => void
+  useMmr: boolean
+  onUseMmrChange: (v: boolean) => void
 }
 
 function PositionInfoCard({
@@ -84,6 +86,8 @@ function PositionInfoCard({
   onHasSLChange,
   stopLoss,
   onStopLossChange,
+  useMmr,
+  onUseMmrChange,
 }: PositionInfoCardProps) {
   return (
     <SectionCard title={commonTexts.positionInfo} description={commonTexts.positionInfoDesc} icon={<Wallet className="h-4 w-4" />}>
@@ -98,6 +102,7 @@ function PositionInfoCard({
           positionId={positionId}
           onPositionIdChange={onPositionIdChange}
         />
+        <CheckboxField checked={useMmr} onChange={onUseMmrChange} label={commonTexts.addMmrExplanation} />
         <CheckboxField checked={hasSL} onChange={onHasSLChange} label={commonTexts.stopLossQuestion} />
         {hasSL && (
           <FormField label={commonTexts.stopLossPrice}>
@@ -132,6 +137,7 @@ function CrossLinearForm({ stable }: { stable: string }) {
   const [positionId, setPositionId] = useState("")
   const [hasSL, setHasSL] = useState(false)
   const [stopLoss, setStopLoss] = useState("")
+  const [useMmrExplanation, setUseMmrExplanation] = useState(false)
   const [result, setResult] = useState<CrossLinearResult | null>(null)
   const [error, setError] = useState("")
   const idRef = useRef(0)
@@ -189,6 +195,8 @@ function CrossLinearForm({ stable }: { stable: string }) {
             onHasSLChange={setHasSL}
             stopLoss={stopLoss}
             onStopLossChange={setStopLoss}
+            useMmr={useMmrExplanation}
+            onUseMmrChange={setUseMmrExplanation}
           />
           <SectionCard title={t.wallet.section.title} description={t.wallet.section.description} icon={<Wallet className="h-4 w-4" />}>
             <FormField label={t.wallet.fields.wallet(stable).label}>
@@ -213,20 +221,20 @@ function CrossLinearForm({ stable }: { stable: string }) {
             )}
             {positions.map(p => (
               <RowPanel key={p.id} index={p.id} label={crossTexts.rowLabels.position} onRemove={() => removePosition(p.id)}>
-                <div className="grid grid-cols-2 gap-2">
-                  <FormField label={t.positions.fields.symbol.label}><Input className="h-10" placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => update(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
+                <div className="grid grid-cols-1 gap-3">
+                  <FormField label={t.positions.fields.symbol.label}><Input placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => update(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
                   <FormField label={t.positions.fields.side}>
                     <Select value={p.side} onValueChange={(v: Direction) => update(p.id, "side", v)}>
-                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="LONG">{commonTexts.side.longUpper}</SelectItem><SelectItem value="SHORT">{commonTexts.side.shortUpper}</SelectItem></SelectContent>
                     </Select>
                   </FormField>
-                  <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input className="h-10" type="number" step="any" value={p.size} onChange={e => update(p.id, "size", e.target.value)} /></FormField>
-                  <FormField label={t.positions.fields.entry}><Input className="h-10" type="number" step="any" value={p.entry} onChange={e => update(p.id, "entry", e.target.value)} /></FormField>
-                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input className="h-10" type="number" step="any" value={p.mmr} onChange={e => update(p.id, "mmr", e.target.value)} /></FormField>
-                  <FormField label={t.positions.fields.mark.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => update(p.id, "mark", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input type="number" step="any" value={p.size} onChange={e => update(p.id, "size", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.entry}><Input type="number" step="any" value={p.entry} onChange={e => update(p.id, "entry", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input type="number" step="any" value={p.mmr} onChange={e => update(p.id, "mmr", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.mark.label}><Input type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => update(p.id, "mark", e.target.value)} /></FormField>
                 </div>
-                <FormField label={t.positions.fields.fee.label} hint={t.positions.fields.fee.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.fee.placeholder} value={p.fee} onChange={e => update(p.id, "fee", e.target.value)} /></FormField>
+                <FormField label={t.positions.fields.fee.label} hint={t.positions.fields.fee.hint}><Input type="number" step="any" placeholder={t.positions.fields.fee.placeholder} value={p.fee} onChange={e => update(p.id, "fee", e.target.value)} /></FormField>
               </RowPanel>
             ))}
             {positions.length > 0 && (
@@ -245,6 +253,7 @@ function CrossLinearForm({ stable }: { stable: string }) {
         <CrossResultView
           result={result}
           hasSL={hasSL}
+          useMmrExplanation={useMmrExplanation}
           directionLabel={sideLabel(direction)}
           currencyLabel={currency.trim() || stable}
           positionIdLabel={positionId.trim() || "—"}
@@ -293,6 +302,7 @@ function CrossCoinMForm() {
   const [positionId, setPositionId] = useState("")
   const [hasSL, setHasSL] = useState(false)
   const [stopLoss, setStopLoss] = useState("")
+  const [useMmrExplanation, setUseMmrExplanation] = useState(false)
   const [result, setResult] = useState<CrossCoinMResult | null>(null)
   const [error, setError] = useState("")
   const posIdRef = useRef(0)
@@ -396,6 +406,8 @@ function CrossCoinMForm() {
             onHasSLChange={setHasSL}
             stopLoss={stopLoss}
             onStopLossChange={setStopLoss}
+            useMmr={useMmrExplanation}
+            onUseMmrChange={setUseMmrExplanation}
           />
           <SectionCard title={t.time.section.title} description={t.time.section.description} icon={<Clock className="h-4 w-4" />}>
             <div className="grid grid-cols-2 gap-3">
@@ -418,25 +430,25 @@ function CrossCoinMForm() {
             )}
             {walletAssets.map(w => (
               <RowPanel key={w.id} index={w.id} label={crossTexts.rowLabels.wallet} onRemove={() => removeWallet(w.id)} accent="success">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-3">
                   <FormField label={t.assets.fields.coin}>
                     <Select value={w.coin} onValueChange={(v: string) => onWalletCoinChange(w.id, v)}>
-                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {COIN_OPTIONS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                         <SelectItem value="OTHER">{t.assets.otherOption}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormField>
-                  <FormField label={t.assets.fields.amount.label}><Input className="h-10" type="number" step="any" placeholder={t.assets.fields.amount.placeholder} value={w.amount} onChange={e => updateWallet(w.id, "amount", e.target.value)} /></FormField>
-                  <FormField label={t.assets.fields.rate.label} hint={t.assets.fields.rate.hint}><Input className="h-10" type="number" step="any" value={w.rate} disabled={w.coin === "USDT"} onChange={e => updateWallet(w.id, "rate", e.target.value)} /></FormField>
+                  <FormField label={t.assets.fields.amount.label}><Input type="number" step="any" placeholder={t.assets.fields.amount.placeholder} value={w.amount} onChange={e => updateWallet(w.id, "amount", e.target.value)} /></FormField>
+                  <FormField label={t.assets.fields.rate.label} hint={t.assets.fields.rate.hint}><Input type="number" step="any" value={w.rate} disabled={w.coin === "USDT"} onChange={e => updateWallet(w.id, "rate", e.target.value)} /></FormField>
                 </div>
                 {w.coin === "OTHER" && (
-                  <FormField label={t.assets.fields.customCoin.label}><Input className="h-10" placeholder={t.assets.fields.customCoin.placeholder} value={w.customCoin} onChange={e => updateWallet(w.id, "customCoin", e.target.value.toUpperCase())} /></FormField>
+                  <FormField label={t.assets.fields.customCoin.label}><Input placeholder={t.assets.fields.customCoin.placeholder} value={w.customCoin} onChange={e => updateWallet(w.id, "customCoin", e.target.value.toUpperCase())} /></FormField>
                 )}
                 {w.coin !== "USDT" && (
                   <FormField label={t.assets.fields.mark.label} hint={t.assets.fields.mark.hint}>
-                    <Input className="h-10" type="number" step="any" placeholder={t.assets.fields.mark.placeholder} value={w.manualMark} onChange={e => updateWallet(w.id, "manualMark", e.target.value)} />
+                    <Input type="number" step="any" placeholder={t.assets.fields.mark.placeholder} value={w.manualMark} onChange={e => updateWallet(w.id, "manualMark", e.target.value)} />
                   </FormField>
                 )}
                 <p className="text-[11px] text-muted-foreground">
@@ -463,34 +475,34 @@ function CrossCoinMForm() {
             )}
             {positions.map(p => (
               <RowPanel key={p.id} index={p.id} label={crossTexts.rowLabels.position} onRemove={() => removePosition(p.id)} accent={p.side === "LONG" ? "success" : "danger"}>
-                <div className="grid grid-cols-2 gap-2">
-                  <FormField label={t.positions.fields.symbol.label}><Input className="h-10" placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => updatePos(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
+                <div className="grid grid-cols-1 gap-3">
+                  <FormField label={t.positions.fields.symbol.label}><Input placeholder={t.positions.fields.symbol.placeholder} value={p.symbol} onChange={e => updatePos(p.id, "symbol", e.target.value.toUpperCase())} /></FormField>
                   <FormField label={t.positions.fields.type}>
                     <Select value={p.type} onValueChange={(v: CoinMPosState["type"]) => updatePos(p.id, "type", v)}>
-                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="COIN-M">{commonTexts.stableTabs.coin}</SelectItem><SelectItem value="USDT-M">{commonTexts.stableTabs.usdt}</SelectItem><SelectItem value="USDC-M">{commonTexts.stableTabs.usdc}</SelectItem></SelectContent>
                     </Select>
                   </FormField>
                   <FormField label={t.positions.fields.side}>
                     <Select value={p.side} onValueChange={(v: Direction) => updatePos(p.id, "side", v)}>
-                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent><SelectItem value="LONG">{commonTexts.side.longUpper}</SelectItem><SelectItem value="SHORT">{commonTexts.side.shortUpper}</SelectItem></SelectContent>
                     </Select>
                   </FormField>
-                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mmr.placeholder} value={p.mmr} onChange={e => updatePos(p.id, "mmr", e.target.value)} /></FormField>
+                  <FormField label={t.positions.fields.mmr.label} hint={t.positions.fields.mmr.hint}><Input type="number" step="any" placeholder={t.positions.fields.mmr.placeholder} value={p.mmr} onChange={e => updatePos(p.id, "mmr", e.target.value)} /></FormField>
                 </div>
                 {p.type === "COIN-M" ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    <FormField label={t.positions.fields.baseCoin.label}><Input className="h-10" placeholder={t.positions.fields.baseCoin.placeholder} value={p.baseCoin} onChange={e => updatePos(p.id, "baseCoin", e.target.value.toUpperCase())} /></FormField>
-                    <FormField label={t.positions.fields.qty.label} hint={t.positions.fields.qty.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.qty.placeholder} value={p.qty} onChange={e => updatePos(p.id, "qty", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.entry.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entry} onChange={e => updatePos(p.id, "entry", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.mark.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => updatePos(p.id, "mark", e.target.value)} /></FormField>
+                  <div className="grid grid-cols-1 gap-3">
+                    <FormField label={t.positions.fields.baseCoin.label}><Input placeholder={t.positions.fields.baseCoin.placeholder} value={p.baseCoin} onChange={e => updatePos(p.id, "baseCoin", e.target.value.toUpperCase())} /></FormField>
+                    <FormField label={t.positions.fields.qty.label} hint={t.positions.fields.qty.hint}><Input type="number" step="any" placeholder={t.positions.fields.qty.placeholder} value={p.qty} onChange={e => updatePos(p.id, "qty", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.entry.label}><Input type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entry} onChange={e => updatePos(p.id, "entry", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.mark.label}><Input type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.mark} onChange={e => updatePos(p.id, "mark", e.target.value)} /></FormField>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-2">
-                    <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.size.placeholder} value={p.size} onChange={e => updatePos(p.id, "size", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.entry.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entryL} onChange={e => updatePos(p.id, "entryL", e.target.value)} /></FormField>
-                    <FormField label={t.positions.fields.mark.label}><Input className="h-10" type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.markL} onChange={e => updatePos(p.id, "markL", e.target.value)} /></FormField>
+                  <div className="grid grid-cols-1 gap-3">
+                    <FormField label={t.positions.fields.size.label} hint={t.positions.fields.size.hint}><Input type="number" step="any" placeholder={t.positions.fields.size.placeholder} value={p.size} onChange={e => updatePos(p.id, "size", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.entry.label}><Input type="number" step="any" placeholder={t.positions.fields.entry.placeholder} value={p.entryL} onChange={e => updatePos(p.id, "entryL", e.target.value)} /></FormField>
+                    <FormField label={t.positions.fields.mark.label}><Input type="number" step="any" placeholder={t.positions.fields.mark.placeholder} value={p.markL} onChange={e => updatePos(p.id, "markL", e.target.value)} /></FormField>
                   </div>
                 )}
               </RowPanel>
@@ -511,6 +523,7 @@ function CrossCoinMForm() {
         <CrossResultView
           result={result}
           hasSL={hasSL}
+          useMmrExplanation={useMmrExplanation}
           directionLabel={sideLabel(direction)}
           currencyLabel={currency.trim() || "USDT"}
           positionIdLabel={positionId.trim() || "—"}
@@ -521,16 +534,32 @@ function CrossCoinMForm() {
   )
 }
 
+function crossBuilderMmrSections(result: CrossResult): { colleague: string; user: string } {
+  const unit = result.isCoinM ? "USDT" : result.stable
+  const lines = result.positions.map(p => {
+    const pair = p.sym.replace(/(USDT|USDC)$/i, "")
+    return `${p.sym} (${p.side}): MMR ${p.mmrPct}% → MM = ${fmt(p.mm)} ${unit} · ${commonTexts.limitsUrl(pair)}`
+  })
+  const refs = [...new Set(result.positions.map(p => {
+    const pair = p.sym.replace(/(USDT|USDC)$/i, "")
+    return commonTexts.limitsUrl(pair)
+  }))].join("\n")
+  const colleague = `Maintenance Margin (MMR/MM) Explanation\n${mmrExplanationTexts.definition}\n${lines.join("\n")}\n${mmrExplanationTexts.tier}\n${mmrExplanationTexts.threshold}\nReference:\n${refs}`
+  const user = `Please also note the maintenance margin (MMR) on your account:\nMMR (Maintenance Margin Rate) is the minimum margin rate required by the exchange to keep positions open, and the Maintenance Margin (MM) is the minimum margin that must remain available at all times.\n${lines.join("\n")}\n${mmrExplanationTexts.tier}\n${mmrExplanationTexts.threshold}\nReference:\n${refs}`
+  return { colleague, user }
+}
+
 interface CrossResultViewProps {
   result: CrossResult
   hasSL?: boolean
+  useMmrExplanation?: boolean
   directionLabel?: string
   currencyLabel?: string
   positionIdLabel?: string
   stopLossPrice?: string
 }
 
-function CrossResultView({ result, hasSL = false, directionLabel = "—", currencyLabel = "—", positionIdLabel = "—", stopLossPrice = "" }: CrossResultViewProps) {
+function CrossResultView({ result, hasSL = false, useMmrExplanation = false, directionLabel = "—", currencyLabel = "—", positionIdLabel = "—", stopLossPrice = "" }: CrossResultViewProps) {
   const t = crossTexts.result
   const liqDt = result.liquidationDate
 
@@ -556,6 +585,7 @@ function CrossResultView({ result, hasSL = false, directionLabel = "—", curren
   const gist = buildGist(result)
   const steps = buildSteps(result)
   const explain = buildExplain(result)
+  const mmrSections = useMmrExplanation ? crossBuilderMmrSections(result) : null
 
   return (
     <div className="space-y-5 animate-slide-up">
@@ -706,6 +736,10 @@ function CrossResultView({ result, hasSL = false, directionLabel = "—", curren
             ? `Your account was liquidated because the combined unrealized losses consumed the wallet equity. Total equity (${eqLabel}) fell to or below the required maintenance margin (${mmLabel}), pushing the margin ratio to ${fmt(result.marginRatio)}%. The exchange force-closed all cross margin positions to prevent a negative balance.`
             : `Your account was not liquidated at this timestamp. Total equity (${eqLabel}) exceeded the required maintenance margin (${mmLabel}), keeping the margin ratio below 100%.`,
           ...(hasSL ? { stopLoss: stopLossLabel, slProximityText } : {}),
+          mmrSection: mmrSections ? mmrSections.colleague : "",
+          mmrSectionUser: mmrSections ? mmrSections.user : "",
+          liqReductionSection: "",
+          liqReductionUser: "",
         }}
       />
     </div>

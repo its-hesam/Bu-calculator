@@ -1,6 +1,7 @@
 export * from "./shared"
 export * from "./isoLinear"
 export * from "./isoCoinM"
+export * from "./isoLiqReduction"
 export * from "./crossLinear"
 export * from "./crossCoinM"
 export * from "./crossReport"

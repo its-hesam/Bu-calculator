@@ -42,7 +42,7 @@ export function calcSlippage(input: SlippageInputs): SlippageResult {
   return {
     pnlAtStopLoss,
     pnlAtActual,
-    slippagePnl: pnlAtStopLoss - pnlAtActual,
+    slippagePnl: pnlAtActual - pnlAtStopLoss,
     slippagePct,
     priceDiff,
     diff,

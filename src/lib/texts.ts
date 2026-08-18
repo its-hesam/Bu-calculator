@@ -47,6 +47,11 @@ export const commonTexts = {
   stopLossPricePlaceholder: "e.g. 57000",
   slProximityClose: "Your Stop Loss was very close to the liquidation price.",
   slProximityFar: "Your Stop Loss was relatively far from the liquidation price.",
+  addMmrExplanation: "Add MMR / MM Explanation",
+  addMmrExplanationHint: "Append a Maintenance Margin (MMR/MM) explanation to both responses",
+  liquidationReduction: "Liquidation Reduction",
+  liquidationReductionHint: "Split the liquidation into a reduction event and a final normal liquidation using actual order-history data",
+  limitsUrl: (pair: string) => `https://www.bitunix.com/contract-trade/${pair}USDT/limits`,
 }
 
 export type TemplateVariant =
@@ -67,39 +72,39 @@ export type TemplateVariant =
 export const templates: Record<TemplateVariant, { colleague: string; user: string }> = {
   isoLinear: {
     colleague:
-      "Internal Note — Isolated Position Liquidation Assessment\n\nPosition: {{direction}} {{market}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nEntry: {{entry}} · Size: {{size}} · MMR: {{mmr}}\nAvailable Margin: {{margin}} {{stable}}\nMaintenance Margin: {{mm}} {{stable}}\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nMaintenance Margin = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Position Liquidation Assessment\n\nPosition: {{direction}} {{market}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nEntry: {{entry}} · Size: {{size}} · MMR: {{mmr}}\nAvailable Margin: {{margin}} {{stable}}\nMaintenance Margin: {{mm}} {{stable}}\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nMaintenance Margin = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\n{{mmrSection}}\n{{liqReductionSection}}\nKindly review and confirm at your earliest convenience.",
     user:
-      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} {{market}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{size}}\nEntry Price: {{entry}} {{stable}}\nAvailable Margin: {{margin}} {{stable}}\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nThe estimated liquidation price for your position is {{liq}}, which represents a {{move}} price move {{belowAbove}} your entry price of {{entry}} {{stable}}.\n\nCalculation Steps:\nMaintenance Margin = Position Size × Entry Price × MMR = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nIf the market price reaches {{liq}}, your position may be subject to forced closure. We kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} {{market}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{size}}\nEntry Price: {{entry}} {{stable}}\nAvailable Margin: {{margin}} {{stable}}\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nThe estimated liquidation price for your position is {{liq}}, which represents a {{move}} price move {{belowAbove}} your entry price of {{entry}} {{stable}}.\n\nCalculation Steps:\nMaintenance Margin = Position Size × Entry Price × MMR = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nIf the market price reaches {{liq}}, your position may be subject to forced closure. We kindly advise you to maintain sufficient margin in your account at all times.\n\n{{mmrSectionUser}}\n{{liqReductionUser}}\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   isoLinearSL: {
     colleague:
-      "Internal Note — Isolated Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} {{market}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nEntry: {{entry}} · Size: {{size}} · MMR: {{mmr}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} {{stable}}\nMaintenance Margin: {{mm}} {{stable}}\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nMaintenance Margin = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} {{market}} ({{currency}})\nPOSITION ID: {{positionId}}\n\nEntry: {{entry}} · Size: {{size}} · MMR: {{mmr}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} {{stable}}\nMaintenance Margin: {{mm}} {{stable}}\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nMaintenance Margin = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\n{{mmrSection}}\n{{liqReductionSection}}\nKindly review and confirm at your earliest convenience.",
     user:
-      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} {{market}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{size}}\nEntry Price: {{entry}} {{stable}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} {{stable}}\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}).\n\nCalculation Steps:\nMaintenance Margin = Position Size × Entry Price × MMR = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nWe kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} {{market}} ({{currency}}) position:\n\n**{{market}}-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: {{market}}\nPosition Size: {{size}}\nEntry Price: {{entry}} {{stable}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} {{stable}}\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}).\n\nCalculation Steps:\nMaintenance Margin = Position Size × Entry Price × MMR = {{size}} × {{entry}} × {{mmr}}% = {{mm}} {{stable}}\nSubtract from Available Margin: {{margin}} − {{mm}} = {{buffer}} {{stable}}\nDivide by Position Size: {{buffer}} ÷ {{size}} = {{diff}}\nLiquidation Price = {{entry}} {{sign}} {{diff}} = {{liq}}\n\nWe kindly advise you to maintain sufficient margin in your account at all times.\n\n{{mmrSectionUser}}\n{{liqReductionUser}}\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   isoCoinM: {
     colleague:
-      "Internal Note — Isolated Coin-M Position Liquidation Assessment\n\nPosition: {{direction}} Coin-M ({{currency}})\nPOSITION ID: {{positionId}}\n\nQuantity: {{qty}} · Entry: {{entry}} · MMR: {{mmr}}\nAvailable Margin: {{margin}} coins\nMaintenance Margin: {{mm}} coins\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = AM − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Coin-M Position Liquidation Assessment\n\nPosition: {{direction}} Coin-M ({{currency}})\nPOSITION ID: {{positionId}}\n\nQuantity: {{qty}} · Entry: {{entry}} · MMR: {{mmr}}\nAvailable Margin: {{margin}} coins\nMaintenance Margin: {{mm}} coins\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = AM − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\n{{mmrSection}}\n{{liqReductionSection}}\nKindly review and confirm at your earliest convenience.",
     user:
-      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} Coin-M ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: Coin-M\nQuantity Unit: {{qty}}\nEntry Price: {{entry}}\nAvailable Margin: {{margin}} coins\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nThe estimated liquidation price for your position is {{liq}}, which represents a {{move}} price move {{belowAbove}} your entry price of {{entry}}.\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = Available Margin − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nIf the market price reaches {{liq}}, your position may be subject to forced closure. We kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} Coin-M ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: Coin-M\nQuantity Unit: {{qty}}\nEntry Price: {{entry}}\nAvailable Margin: {{margin}} coins\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nThe estimated liquidation price for your position is {{liq}}, which represents a {{move}} price move {{belowAbove}} your entry price of {{entry}}.\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = Available Margin − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nIf the market price reaches {{liq}}, your position may be subject to forced closure. We kindly advise you to maintain sufficient margin in your account at all times.\n\n{{mmrSectionUser}}\n{{liqReductionUser}}\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   isoCoinMSL: {
     colleague:
-      "Internal Note — Isolated Coin-M Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} Coin-M ({{currency}})\nPOSITION ID: {{positionId}}\n\nQuantity: {{qty}} · Entry: {{entry}} · MMR: {{mmr}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} coins\nMaintenance Margin: {{mm}} coins\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = AM − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Isolated Coin-M Position Stopped Out (Stop Loss)\n\nPosition: {{direction}} Coin-M ({{currency}})\nPOSITION ID: {{positionId}}\n\nQuantity: {{qty}} · Entry: {{entry}} · MMR: {{mmr}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} coins\nMaintenance Margin: {{mm}} coins\nLeverage: {{leverage}}\n\nEstimated Liquidation Price: {{liq}}\nPrice Move: {{move}} ({{direction}})\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = AM − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\n{{mmrSection}}\n{{liqReductionSection}}\nKindly review and confirm at your earliest convenience.",
     user:
-      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} Coin-M ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: Coin-M\nQuantity Unit: {{qty}}\nEntry Price: {{entry}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} coins\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}).\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = Available Margin − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nWe kindly advise you to maintain sufficient margin in your account at all times.\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
+      "Thank you for your patience while we reviewed the details of your position.\n\nWe have thoroughly reviewed your {{direction}} Coin-M ({{currency}}) position:\n\n**Coin-M-{{direction}}**\n**POSITION ID:** {{positionId}}\n\nSymbol: {{currency}}\nDirection: {{direction}}\nMarket: Coin-M\nQuantity Unit: {{qty}}\nEntry Price: {{entry}}\nStop Loss Price: {{stopLoss}}\nAvailable Margin: {{margin}} coins\nLeverage: {{leverage}}\nMMR: {{mmr}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nThe estimated liquidation price was {{liq}} (a {{move}} price move from your entry of {{entry}}).\n\nCalculation Steps:\nPosition Value (PV) = Qty ÷ Entry Price = {{qty}} ÷ {{entry}} = {{pv}} coins\nMaintenance Margin (MM) = PV × MMR = {{pv}} × {{mmr}}% = {{mm}} coins\nBankruptcy Fee (BF) = PV × 0.06% = {{pv}} × 0.0006 = {{bf}} coins\nAdjustment = Available Margin − MM − BF = {{margin}} − {{mm}} − {{bf}} = {{adj}} coins\nLiquidation Price = Qty ÷ (PV {{sign}} Adjustment) = {{qty}} ÷ ({{pv}} {{sign}} {{adj}}) = {{liq}}\n\nWe kindly advise you to maintain sufficient margin in your account at all times.\n\n{{mmrSectionUser}}\n{{liqReductionUser}}\n\nWe hope this detailed breakdown clarifies how your estimated liquidation price was calculated.",
   },
   cross: {
     colleague:
-      "Internal Note — Cross Margin Assessment at {{time}}\n\nPosition: {{direction}} {{currency}} · POSITION ID {{positionId}}\nVerdict: {{verdict}}\n\n{{count}} position(s) · Wallet {{walletDisplay}} · Unrealized PnL {{pnlDisplay}} · Equity {{equityDisplay}}\nMaintenance Margin {{mmDisplay}} → Margin Ratio {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Cross Margin Assessment at {{time}}\n\nPosition: {{direction}} {{currency}} · POSITION ID {{positionId}}\nVerdict: {{verdict}}\n\n{{count}} position(s) · Wallet {{walletDisplay}} · Unrealized PnL {{pnlDisplay}} · Equity {{equityDisplay}}\nMaintenance Margin {{mmDisplay}} → Margin Ratio {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{mmrSection}}\n{{liqReductionSection}}\nKindly review and confirm at your earliest convenience.",
     user:
-      "Thank you for your patience while we reviewed your cross-margin account.\n\nWe have thoroughly assessed your cross-margin account at {{time}} (UTC):\n\n**Cross Margin Assessment**\n**POSITION ID:** {{positionId}}\n\nVerdict: {{verdict}}\nWallet Balance: {{walletDisplay}}\nTotal Unrealized PnL: {{pnlDisplay}}\nTotal Equity: {{equityDisplay}}\nMaintenance Margin Required: {{mmDisplay}}\nMargin Ratio: {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = Maintenance Margin ÷ Equity × 100 = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{verdictDetail}}\n\nWe hope this detailed breakdown clarifies the assessment of your cross-margin account.",
+      "Thank you for your patience while we reviewed your cross-margin account.\n\nWe have thoroughly assessed your cross-margin account at {{time}} (UTC):\n\n**Cross Margin Assessment**\n**POSITION ID:** {{positionId}}\n\nVerdict: {{verdict}}\nWallet Balance: {{walletDisplay}}\nTotal Unrealized PnL: {{pnlDisplay}}\nTotal Equity: {{equityDisplay}}\nMaintenance Margin Required: {{mmDisplay}}\nMargin Ratio: {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = Maintenance Margin ÷ Equity × 100 = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{verdictDetail}}\n{{mmrSectionUser}}\n{{liqReductionUser}}\n\nWe hope this detailed breakdown clarifies the assessment of your cross-margin account.",
   },
   crossSL: {
     colleague:
-      "Internal Note — Cross Margin Assessment (Stop Loss) at {{time}}\n\nPosition: {{direction}} {{currency}} · POSITION ID {{positionId}}\nStop Loss Price: {{stopLoss}}\nVerdict: {{verdict}}\n\n{{count}} position(s) · Wallet {{walletDisplay}} · Unrealized PnL {{pnlDisplay}} · Equity {{equityDisplay}}\nMaintenance Margin {{mmDisplay}} → Margin Ratio {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\nKindly review and confirm at your earliest convenience.",
+      "Internal Note — Cross Margin Assessment (Stop Loss) at {{time}}\n\nPosition: {{direction}} {{currency}} · POSITION ID {{positionId}}\nStop Loss Price: {{stopLoss}}\nVerdict: {{verdict}}\n\n{{count}} position(s) · Wallet {{walletDisplay}} · Unrealized PnL {{pnlDisplay}} · Equity {{equityDisplay}}\nMaintenance Margin {{mmDisplay}} → Margin Ratio {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{slProximityText}}\nThe position had a Stop Loss in place and was closed by it before liquidation could occur.\n\n{{mmrSection}}\n{{liqReductionSection}}\nKindly review and confirm at your earliest convenience.",
     user:
-      "Thank you for your patience while we reviewed your cross-margin account.\n\nWe have thoroughly assessed your cross-margin account at {{time}} (UTC):\n\n**Cross Margin Assessment**\n**POSITION ID:** {{positionId}}\n\nVerdict: {{verdict}}\nWallet Balance: {{walletDisplay}}\nTotal Unrealized PnL: {{pnlDisplay}}\nTotal Equity: {{equityDisplay}}\nMaintenance Margin Required: {{mmDisplay}}\nMargin Ratio: {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = Maintenance Margin ÷ Equity × 100 = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{verdictDetail}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n\nWe hope this detailed breakdown clarifies the assessment of your cross-margin account.",
+      "Thank you for your patience while we reviewed your cross-margin account.\n\nWe have thoroughly assessed your cross-margin account at {{time}} (UTC):\n\n**Cross Margin Assessment**\n**POSITION ID:** {{positionId}}\n\nVerdict: {{verdict}}\nWallet Balance: {{walletDisplay}}\nTotal Unrealized PnL: {{pnlDisplay}}\nTotal Equity: {{equityDisplay}}\nMaintenance Margin Required: {{mmDisplay}}\nMargin Ratio: {{ratio}}%\n\nCalculation:\nEquity = Wallet + Unrealized PnL = {{walletNum}} + ({{pnlNum}}) = {{equityNum}} {{unit}}\nMargin Ratio = Maintenance Margin ÷ Equity × 100 = {{mmNum}} ÷ {{equityNum}} × 100 = {{ratio}}%\n\n{{verdictDetail}}\n\nYour position had a Stop Loss in place and was closed at the Stop Loss price of {{stopLoss}} before liquidation could occur.\n\n{{slProximityText}}\n{{mmrSectionUser}}\n{{liqReductionUser}}\n\nWe hope this detailed breakdown clarifies the assessment of your cross-margin account.",
   },
   pnlLinear: {
     colleague:
@@ -133,7 +138,7 @@ export const templates: Record<TemplateVariant, { colleague: string; user: strin
   },
   slippage: {
     colleague:
-      "Thank you for your patience.\n\nWe completely understand how important this matter is to you.\n\nWe have thoroughly reviewed the position:\n\n**{{pair}}-Isolated-{{leverage}}x-{{side}}**\n**POSITION ID:** {{positionId}}\n**CLOSED AT:** {{closedPrice}}\n**Stop loss:** {{stopLossPrice}} (Market)\n\n{{priceDiffFormula}}\n\n{{pnlDiffFormula}}\n\nBased on our investigation, the stop loss order was configured as a Market order.\n\nWith market orders, once the trigger price is reached, the order is immediately executed at the best available price in the order book.\n\nAs a result, during periods of rapid price movement or sharp market fluctuations, a small difference between the trigger price and the final execution price may occur. This is a normal market behavior known as market fluctuation and does not indicate any issue with the system.\n\nThis means your stop loss was triggered correctly.\n\nHowever, due to the extremely rapid price movement at that moment, the difference between the trigger price and the final execution price is considered normal under such market conditions, as the order execution may be affected by the speed of the price movement.\n\nTherefore, there was no problem on the system side, and the order was executed according to the market conditions at that time.",
+      "Thank you for your patience.\n\nWe completely understand how important this matter is to you.\n\nWe have thoroughly reviewed the position:\n\n**{{pair}}-Isolated-{{leverage}}x-{{side}}**\n**POSITION ID:** {{positionId}}\n**CLOSED AT:** {{closedPrice}}\n**Stop loss:** {{stopLossPrice}} (Market)\n\n{{pnlDiffFormula}}\n\nBased on our investigation, the stop loss order was configured as a Market order.\n\nWith market orders, once the trigger price is reached, the order is immediately executed at the best available price in the order book.\n\nAs a result, during periods of rapid price movement or sharp market fluctuations, a small difference between the trigger price and the final execution price may occur. This is a normal market behavior known as market fluctuation and does not indicate any issue with the system.\n\nThis means your stop loss was triggered correctly.\n\nHowever, due to the extremely rapid price movement at that moment, the difference between the trigger price and the final execution price is considered normal under such market conditions, as the order execution may be affected by the speed of the price movement.\n\nTherefore, there was no problem on the system side, and the order was executed according to the market conditions at that time.",
     user:
       "Thank you for your patience.\n\nWe completely understand how important this matter is to you.\n\nWe have thoroughly reviewed the position:\n\n**{{pair}}-Isolated-{{leverage}}x-{{side}}**\n**POSITION ID:** {{positionId}}\n**CLOSED AT:** {{closedPrice}}\n**Stop loss:** {{stopLossPrice}} (Market)\n\nBased on our investigation, the stop loss order was configured as a Market order.\n\nWith market orders, once the trigger price is reached, the order is immediately executed at the best available price in the order book.\n\nAs a result, during periods of rapid price movement or sharp market fluctuations, a small difference between the trigger price and the final execution price may occur. This is a normal market behavior known as market fluctuation and does not indicate any issue with the system.\n\nThis means your stop loss was triggered correctly.\n\nHowever, due to the extremely rapid price movement at that moment, the difference between the trigger price and the final execution price is considered normal under such market conditions, as the order execution may be affected by the speed of the price movement.\n\nTherefore, there was no problem on the system side, and the order was executed according to the market conditions at that time.",
   },
@@ -156,7 +161,7 @@ export const isoTexts = {
     fields: {
       entry: { label: "Avg. Open Price", placeholder: "e.g. 60000" },
       size: { label: "Position Size", hint: "coins", placeholder: "e.g. 0.5" },
-      mmr: { label: "MMR", hint: "%", placeholder: "e.g. 0.5" },
+      mmr: { label: "Maintenance Margin Rate (MMR)", hint: "%", placeholder: "e.g. 0.5" },
       leverage: { label: "Leverage", hint: "option A", placeholder: "e.g. 10" },
       margin: (stable: string) => ({ label: `Available Margin (${stable})`, hint: "option B — preferred", placeholder: "e.g. 500" }),
     },
@@ -224,9 +229,9 @@ export const isoTexts = {
   coinM: {
     section: { title: "Position Details", description: "Coin-margined futures settle in the base coin" },
     fields: {
-      qty: { label: "Quantity Unit", hint: "USD", placeholder: "e.g. 10000" },
+      qty: { label: "Quantity Unit (USD)", hint: "USD", placeholder: "e.g. 10000" },
       entry: { label: "Open Price", placeholder: "e.g. 60000" },
-      mmr: { label: "MMR", hint: "%", placeholder: "e.g. 0.5" },
+      mmr: { label: "Maintenance Margin Rate (MMR)", hint: "%", placeholder: "e.g. 0.5" },
       leverage: { label: "Leverage", hint: "option A", placeholder: "e.g. 10" },
       margin: { label: "Available Margin", hint: "option B — preferred, coins", placeholder: "e.g. 0.15" },
     },
@@ -311,9 +316,9 @@ export const crossTexts = {
       fields: {
         symbol: { label: "Symbol", placeholder: "e.g. BTCUSDT" },
         side: "Side",
-        size: { label: "Size", hint: "coins" },
+        size: { label: "Position Size", hint: "coins" },
         entry: "Entry Price",
-        mmr: { label: "MMR", hint: "%" },
+        mmr: { label: "Maintenance Margin Rate (MMR)", hint: "%" },
         mark: { label: "Mark Price", placeholder: "At liquidation" },
         fee: { label: "Closing Fee", hint: "optional", placeholder: "e.g. 4.20" },
       },
@@ -345,7 +350,7 @@ export const crossTexts = {
       fields: {
         coin: "Coin",
         amount: { label: "Amount", placeholder: "e.g. 1.5" },
-        rate: { label: "Rate", hint: "%" },
+        rate: { label: "Exchange Rate", hint: "%" },
         customCoin: { label: "Coin Name", placeholder: "e.g. AVAX" },
         mark: { label: "Mark Price (USDT)", hint: "if no matching position", placeholder: "e.g. 83.00" },
       },
@@ -367,12 +372,12 @@ export const crossTexts = {
         symbol: { label: "Symbol", placeholder: "e.g. SOLUSDT" },
         type: "Contract Type",
         side: "Side",
-        mmr: { label: "MMR", hint: "%", placeholder: "e.g. 0.5" },
+        mmr: { label: "Maintenance Margin Rate (MMR)", hint: "%", placeholder: "e.g. 0.5" },
         baseCoin: { label: "Base Coin", placeholder: "e.g. SOL" },
-        qty: { label: "Quantity", hint: "USD", placeholder: "e.g. 10000" },
+        qty: { label: "Quantity Unit (USD)", hint: "USD", placeholder: "e.g. 10000" },
         entry: { label: "Entry Price", placeholder: "e.g. 80" },
         mark: { label: "Mark Price", placeholder: "e.g. 83" },
-        size: { label: "Size", hint: "coins", placeholder: "e.g. 10" },
+        size: { label: "Position Size", hint: "coins", placeholder: "e.g. 10" },
       },
     },
     errors: {
@@ -585,7 +590,7 @@ export const pnlTexts = {
       coin: { label: "Coin Name", placeholder: "e.g. BTC, ETH, SOL" },
       open: { label: "Open Price", placeholder: "e.g. 60000" },
       close: { label: "Close Price", placeholder: "e.g. 63000" },
-      qty: { label: "Quantity Unit", hint: "USD", placeholder: "e.g. 10000" },
+      qty: { label: "Quantity Unit (USD)", hint: "USD", placeholder: "e.g. 10000" },
       margin: { label: "Margin / Initial Investment", hint: "optional — enables ROI", placeholder: "Leave blank to skip ROI" },
     },
     calculate: "Calculate PnL",
@@ -746,6 +751,15 @@ export const slippageTexts = {
     pnlShort: "PnL = (Entry − Close) × Position Size",
     pnlImpact: "PnL (actual) − PnL (stop loss)",
   },
+  difference: {
+    heading: "Difference PnL (Slippage Impact)",
+    pnlAtStopLoss: (side: "long" | "short", entry: string, price: string, size: string, result: string) =>
+      `${side === "long" ? "PnL at Stop Loss (Long) = (Stop Loss − Entry) × Size = (" : "PnL at Stop Loss (Short) = (Entry − Stop Loss) × Size = ("}${price} − ${entry}) × ${size} = ${result} USDT`,
+    pnlAtActual: (side: "long" | "short", entry: string, price: string, size: string, result: string) =>
+      `${side === "long" ? "PnL at Actual Close (Long) = (Actual Close − Entry) × Size = (" : "PnL at Actual Close (Short) = (Entry − Actual Close) × Size = ("}${price} − ${entry}) × ${size} = ${result} USDT`,
+    result: (pnlAtStopLoss: string, pnlAtActual: string, pnlDiff: string) =>
+      `Difference PnL = PnL at Actual Close − PnL at Stop Loss = (${pnlAtStopLoss} USDT) − (${pnlAtActual} USDT) = ${pnlDiff} USDT`,
+  },
   about: {
     heading: "About Stop Loss Slippage",
     paragraph1:
@@ -844,4 +858,113 @@ If you have any questions about specific transactions or require further analysi
 Best regards,
 Customer Support Team
   `.trim(),
+}
+
+export const mmrExplanationTexts = {
+  definition:
+    "MMR (Maintenance Margin Rate) is the minimum margin rate required by the exchange to keep a position open. The Maintenance Margin (MM) is the minimum amount of margin that must remain available for the position at all times.",
+  formulas: {
+    linear: "Maintenance Margin (MM) = Position Size × Entry Price × MMR%",
+    coinM: "Maintenance Margin (MM) = Position Value (PV) × MMR%, where PV = Quantity Unit ÷ Entry Price",
+  },
+  tier:
+    "The applicable MMR/MM depends on the position size and the position tier. If the position size exceeds the limit of a lower tier (e.g. Tier 1), the position moves to the higher tier and the applicable MMR/MM changes accordingly.",
+  threshold:
+    "The liquidation threshold is determined by comparing the available margin/equity to the required Maintenance Margin (MM). Once the available margin/equity reaches or falls below the Maintenance Margin, the position becomes eligible for liquidation.",
+  reference: (pair: string) => `Relevant trading pair/coin: ${commonTexts.limitsUrl(pair)}`,
+  build: (p: {
+    pair: string
+    stable: string
+    size: string
+    entry: string
+    mmrPct: string
+    mm: string
+    tier: string
+    isCoinM?: boolean
+  }) => {
+    const formula = p.isCoinM ? mmrExplanationTexts.formulas.coinM : mmrExplanationTexts.formulas.linear
+    const calc = p.isCoinM ? `${p.size} ÷ ${p.entry} × ${p.mmrPct}%` : `${p.size} × ${p.entry} × ${p.mmrPct}%`
+    return `Maintenance Margin (MMR/MM) Explanation\n${mmrExplanationTexts.definition}\n${formula} = ${calc} = ${p.mm} ${p.stable}\nThe position size places this position in ${p.tier}, which determines the applicable MMR (${p.mmrPct}%).\n${mmrExplanationTexts.tier}\n${mmrExplanationTexts.threshold}\n${mmrExplanationTexts.reference(p.pair)}`
+  },
+  buildUser: (p: {
+    pair: string
+    stable: string
+    size: string
+    entry: string
+    mmrPct: string
+    mm: string
+    tier: string
+    isCoinM?: boolean
+  }) => {
+    const formula = p.isCoinM ? mmrExplanationTexts.formulas.coinM : mmrExplanationTexts.formulas.linear
+    const calc = p.isCoinM ? `${p.size} ÷ ${p.entry} × ${p.mmrPct}%` : `${p.size} × ${p.entry} × ${p.mmrPct}%`
+    return `Please also note the maintenance margin (MMR) on your position:\nMMR (Maintenance Margin Rate) is the minimum margin rate required to keep your position open, and the Maintenance Margin (MM) is the minimum margin that must remain available at all times.\n${formula} = ${calc} = ${p.mm} ${p.stable}\nThe position size places your position in ${p.tier}, which determines the applicable MMR (${p.mmrPct}%). The applicable MMR/MM depends on the position tier, so if the position size crosses a tier limit, the required maintenance margin changes.\nOnce the available margin/equity reaches or falls below this maintenance margin, the position becomes eligible for liquidation.\nFor reference, the position limits and maintenance margin schedule for ${p.pair} can be found at: ${commonTexts.limitsUrl(p.pair)}`
+  },
+}
+
+export const liqReductionTexts = {
+  section: {
+    title: "Liquidation Reduction",
+    description: "Dynamic position tiers (e.g. Tier 3/4) with liquidation-reduction orders from Order History, processed chronologically",
+  },
+  tiers: {
+    heading: "Position Tiers",
+    add: (n: number) => (n > 2 ? `Add Tier ${n}` : "Add Tier 2"),
+    remove: "Remove Tier",
+    maxSize: (unit: string) => ({ label: "Max Size", hint: unit }),
+    maxSizeTopHint: (unit: string) => `optional on the top tier — blank = unbounded, ${unit}`,
+    mmr: { label: "Maintenance Margin Rate (MMR)", hint: "%" },
+  },
+  orders: {
+    heading: "Liquidation-Reduction Orders (Order History)",
+    description: "Each trigger reduces the position by an actual order; processed chronologically",
+    add: "Add Reduction Order",
+    remove: "Remove Order",
+    fields: {
+      time: { label: "Time", hint: "optional — orders are processed chronologically" },
+      size: (unit: string) => ({ label: "Reduction Size", hint: `actual reduced size, ${unit}` }),
+      pnl: (unit: string) => ({ label: "Reduction PnL", hint: `realized PnL of the order, ${unit}` }),
+    },
+  },
+  errors: {
+    tierMin: "At least two position tiers are required.",
+    tierMmr: "Enter a valid MMR for every position tier.",
+    tierMaxSize: "Enter a valid Max Size for every tier except the top tier.",
+    tierIncreasing: "Tier max sizes must be strictly increasing.",
+    orderMin: "At least one liquidation-reduction order is required.",
+    orderSize: "Enter a valid reduction size for every liquidation-reduction order.",
+    orderPnl: "Enter the realized PnL for every liquidation-reduction order.",
+    overReduce: "The total liquidation-reduced size must be smaller than the original position size.",
+  },
+  stageA: "Liquidation Reduction (Calculation A)",
+  stageB: "Final / Normal Liquidation (Calculation B)",
+  explain: {
+    colleague: (p: {
+      market: string
+      direction: string
+      originalSize: string
+      originalTier: string
+      originalMmrPct: string
+      originalMm: string
+      stable: string
+      marginBefore: string
+      events: string[]
+      marginAfter: string
+      remainingSize: string
+      remainingTier: string
+      remainingMmrPct: string
+      finalLiq: string
+      finalMove: string
+      finalMm: string
+    }) => `\nLIQUIDATION REDUCTION — CALCULATION A\nOriginal position size: ${p.originalSize}\nPosition tier: ${p.originalTier} (the position size exceeds the lower tier limits, so the applicable MMR is ${p.originalMmrPct}%)\nMaintenance Margin (MM) of the original tier: ${p.originalMm} ${p.stable}\nAvailable margin/equity before reduction: ${p.marginBefore} ${p.stable}\nTrigger: the available margin/equity dropped to or below the required Maintenance Margin, so the liquidation-reduction mechanism was triggered.\nLiquidation-reduction orders (actual Order History, chronological):\n${p.events.join("\n")}\nMargin after all reductions: ${p.marginAfter} ${p.stable}\nRemaining position size: ${p.remainingSize} → ${p.remainingTier}, applicable MMR ${p.remainingMmrPct}%\nWhy partial / repeated: under the liquidation-reduction mechanism, each trigger reduces only the size needed to bring the remaining position into the applicable lower tier — the entire position is not liquidated at once. When the position was still subject to liquidation after a reduction, the mechanism triggered again on the reduced position.\n\nFINAL / NORMAL LIQUIDATION — CALCULATION B\nRemaining position size: ${p.remainingSize} · MMR (${p.remainingTier}): ${p.remainingMmrPct}% → MM = ${p.finalMm} ${p.stable}\nEstimated liquidation price of the remaining position: ${p.finalLiq}\nPrice move: ${p.finalMove} (${p.direction})\nThis final liquidation is calculated separately from the reduction events above, using the remaining position after all reductions.`,
+    user: (p: {
+      pair: string
+      direction: string
+      tier: string
+      events: string[]
+      remainingSize: string
+      finalLiq: string
+      finalMove: string
+    }) => `Regarding the liquidation of your ${p.pair} position:\n\n1. Liquidation Reduction (Calculation A):\nThe position size placed your position in ${p.tier}, which caused the applicable maintenance margin tier to change. Because the available margin could not sustain the required maintenance margin, the liquidation-reduction mechanism was triggered and the position was reduced in stages. The reduced quantities are based on the actual liquidation-reduction orders recorded in your Order History:\n${p.events.join("\n")}\n\n2. Final / Normal Liquidation (Calculation B):\nThe remaining position (${p.remainingSize}) was then evaluated separately for normal liquidation. Its estimated liquidation price is ${p.finalLiq}, which represents a ${p.finalMove} move for the ${p.direction} position.`,
+  },
 }

@@ -97,7 +97,7 @@ export function FundFlowPage() {
               ))}
               <FileDropZone onFiles={addFiles} />
             </div>
-            <div className="grid gap-3.5">
+            <div className="grid gap-4">
               <FormField label={t.fields.frozen}>
                 <Input type="number" step="0.00000001" value={frozen} onChange={e => setFrozen(e.target.value)} />
               </FormField>

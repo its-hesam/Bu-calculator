@@ -52,7 +52,7 @@ export function FundingFeeTab() {
               onPositionIdChange={setPositionId}
               showDirection={false}
             />
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               <SideField value={side} onChange={(v) => setSide(v)} />
               <FormField label={t.fields.size.label} hint={t.fields.size.hint}>
                 <Input type="number" step="any" placeholder={t.fields.size.placeholder} value={size} onChange={e => setSize(e.target.value)} />

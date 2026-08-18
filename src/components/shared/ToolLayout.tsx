@@ -13,7 +13,7 @@ interface ToolLayoutProps {
 
 export function ToolLayout({ form, action, errors, result, className }: ToolLayoutProps) {
   return (
-    <div className={cn("grid gap-8 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:items-start lg:gap-12", className)}>
+    <div className={cn("grid gap-8 lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:items-start lg:gap-10", className)}>
       <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
         <div className="divide-y divide-border/70 overflow-hidden rounded-2xl border border-border/80 bg-surface/30">
           {form}

@@ -108,17 +108,17 @@ function FeeRowList({ rows, setRows, addLabel, emptyText, rowLabel, accent, time
       )}
       {rows.map(r => (
         <RowPanel key={r.id} index={r.id} label={rowLabel} onRemove={() => setRows(rows.filter(x => x.id !== r.id))} accent={accent}>
-          <div className="grid grid-cols-2 gap-2">
-            <FormField label={timeLabel} className="col-span-2">
-              <Input className="h-10" type="text" placeholder={timePlaceholder} value={r.time} onChange={e => update(r.id, "time", e.target.value)} />
+          <div className="grid grid-cols-1 gap-3">
+            <FormField label={timeLabel}>
+              <Input type="text" placeholder={timePlaceholder} value={r.time} onChange={e => update(r.id, "time", e.target.value)} />
             </FormField>
             <FormField label={priceLabel}>
-              <Input className="h-10" type="number" step="any" placeholder={pricePlaceholder} value={r.price} onChange={e => update(r.id, "price", e.target.value)} />
+              <Input type="number" step="any" placeholder={pricePlaceholder} value={r.price} onChange={e => update(r.id, "price", e.target.value)} />
             </FormField>
             <FormField label={qtyLabel} hint={qtyHint}>
-              <Input className="h-10" type="number" step="any" placeholder={qtyPlaceholder} value={r.qty} onChange={e => update(r.id, "qty", e.target.value)} />
+              <Input type="number" step="any" placeholder={qtyPlaceholder} value={r.qty} onChange={e => update(r.id, "qty", e.target.value)} />
             </FormField>
-            <FormField label={typeLabel} className="col-span-2">
+            <FormField label={typeLabel}>
               <OrderTypeSelect value={r.orderType} onChange={(v) => update(r.id, "orderType", v)} />
             </FormField>
           </div>

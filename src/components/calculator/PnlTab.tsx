@@ -73,7 +73,7 @@ function PnlLinearForm({ stable }: { stable: string }) {
               onPositionIdChange={setPositionId}
               showDirection={false}
             />
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               <SideField value={side} onChange={(v) => setSide(v)} />
               <FormField label={t.fields.qty.label} hint={t.fields.qty.hint}>
                 <Input type="number" step="any" placeholder={t.fields.qty.placeholder} value={qty} onChange={e => setQty(e.target.value)} />
@@ -200,7 +200,7 @@ function PnlCoinMForm() {
               onPositionIdChange={setPositionId}
               showDirection={false}
             />
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               <SideField value={side} onChange={(v) => setSide(v)} />
               <FormField label={t.fields.coin.label}>
                 <Input placeholder={t.fields.coin.placeholder} value={coinName} onChange={e => setCoinName(e.target.value.toUpperCase())} />

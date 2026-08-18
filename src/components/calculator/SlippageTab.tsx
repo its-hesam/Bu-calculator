@@ -46,7 +46,7 @@ export function SlippageTab() {
   }
 
   const pnlTone = (v: number) => (v >= 0 ? "success" : "danger")
-  const signed = (v: number) => `${v >= 0 ? "+" : ""}${fmt(v, 6)} ${cur}`
+  const signed = (v: number) => `${v >= 0 ? "+" : ""}${fmt(v, 6)} USDT`
 
   return (
     <ToolLayout
@@ -63,7 +63,7 @@ export function SlippageTab() {
               positionId={positionId}
               onPositionIdChange={setPositionId}
             />
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               <FormField label={t.fields.entry.label}>
                 <Input type="number" step="any" placeholder={t.fields.entry.placeholder} value={entry} onChange={e => setEntry(e.target.value)} />
               </FormField>
@@ -93,15 +93,15 @@ export function SlippageTab() {
             title={t.hero.title}
             value={`${fmt(result.slippagePct, 6)}%`}
             tone="warning"
-            sub={t.heroSub(fmt(result.priceDiff, 6), cur, size)}
+            sub={t.heroSub(fmt(result.priceDiff, 6), "USDT", size)}
           />
 
           <MetricGrid className="sm:grid-cols-3">
             <Stat label={t.stats.pnlAtSL} value={signed(result.pnlAtStopLoss)} tone={pnlTone(result.pnlAtStopLoss)} icon={<TrendingUp className="h-4 w-4" />} />
             <Stat label={t.stats.pnlActual} value={signed(result.pnlAtActual)} tone={pnlTone(result.pnlAtActual)} icon={<TrendingDown className="h-4 w-4" />} />
-            <Stat label={t.stats.slippagePnl} value={`${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)} ${cur}`} tone="danger" icon={<GripHorizontal className="h-4 w-4" />} />
+            <Stat label={t.stats.slippagePnl} value={`${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)} USDT`} tone={pnlTone(result.slippagePnl)} icon={<GripHorizontal className="h-4 w-4" />} />
             <Stat label={t.stats.slippage} value={`${fmt(result.slippagePct, 6)}%`} tone="warning" icon={<Percent className="h-4 w-4" />} />
-            <Stat label={t.stats.priceDiff} value={`${fmt(result.priceDiff, 6)} ${cur}`} tone="primary" icon={<CircleDollarSign className="h-4 w-4" />} />
+            <Stat label={t.stats.priceDiff} value={`${fmt(result.priceDiff, 6)} USDT`} tone="primary" icon={<CircleDollarSign className="h-4 w-4" />} />
             <Stat label={t.stats.actual} value={fmt(parseFloat(actual), 6)} sub={`${t.stats.stopLoss}: ${fmt(parseFloat(stopLoss), 6)}`} icon={<Crosshair className="h-4 w-4" />} />
           </MetricGrid>
 
@@ -126,7 +126,7 @@ export function SlippageTab() {
             </BreakdownRow>
             <BreakdownRow icon={<BadgeDollarSign className="h-4 w-4" />} title={t.breakdown.pnlImpact} tone="danger">
               <p className="font-mono text-[13px]">{commonTexts.formula}: {t.formulas.pnlImpact}<br />
-                {fmt(result.pnlAtActual, 6)} − ({fmt(result.pnlAtStopLoss, 6)}) = <strong className="text-destructive">{result.slippagePnl >= 0 ? "+" : ""}{fmt(result.slippagePnl, 6)} ${cur}</strong>
+                {fmt(result.pnlAtActual, 6)} − ({fmt(result.pnlAtStopLoss, 6)}) = <strong className={result.slippagePnl >= 0 ? "text-success" : "text-destructive"}>{result.slippagePnl >= 0 ? "+" : ""}{fmt(result.slippagePnl, 6)} USDT</strong>
               </p>
               <p className="mt-1 text-xs text-muted-foreground">The extra loss (or gain) caused by the position closing worse than the Stop Loss price.</p>
             </BreakdownRow>
@@ -134,7 +134,7 @@ export function SlippageTab() {
               <p className="font-mono text-[13px]">{commonTexts.formula}: {t.formulas.slippage}<br />|{stopLoss} − {actual}| ÷ {stopLoss} × 100 = <strong className="text-warning">{fmt(result.slippagePct, 6)}%</strong></p>
             </BreakdownRow>
             <BreakdownRow icon={<BadgeDollarSign className="h-4 w-4" />} title={t.breakdown.priceDiff} tone="primary">
-              <p className="font-mono text-[13px]">{commonTexts.formula}: {t.formulas.priceDiff}<br />|{stopLoss} − {actual}| × {size} = <strong className="text-primary">{fmt(result.priceDiff, 6)} ${cur}</strong></p>
+              <p className="font-mono text-[13px]">{commonTexts.formula}: {t.formulas.priceDiff}<br />|{stopLoss} − {actual}| × {size} = <strong className="text-primary">{fmt(result.priceDiff, 6)} USDT</strong></p>
             </BreakdownRow>
           </BreakdownPanel>
 
@@ -153,8 +153,11 @@ export function SlippageTab() {
               positionId: positionId.trim() || "—",
               closedPrice: fmt(parseFloat(actual), 6),
               stopLossPrice: fmt(parseFloat(stopLoss), 6),
-              priceDiffFormula: `Price Difference = |Stop Loss − Actual Close| × Position Size = |${stopLoss} − ${actual}| × ${size} = ${fmt(result.priceDiff, 6)} ${cur}`,
-              pnlDiffFormula: `PnL Difference = PnL at Stop Loss − PnL at Actual Close = (${signed(result.pnlAtStopLoss)}) − (${signed(result.pnlAtActual)}) = ${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)} ${cur}`,
+              pnlDiffFormula: [
+                t.difference.pnlAtStopLoss(direction, entry, stopLoss, size, fmt(result.pnlAtStopLoss, 6)),
+                t.difference.pnlAtActual(direction, entry, actual, size, fmt(result.pnlAtActual, 6)),
+                t.difference.result(fmt(result.pnlAtStopLoss, 6), fmt(result.pnlAtActual, 6), `${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)}`),
+              ].join("\n"),
             }}
           />
         </div>

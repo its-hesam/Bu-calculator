@@ -11,7 +11,7 @@ interface CheckboxFieldProps {
 
 export function CheckboxField({ checked, onChange, label, className }: CheckboxFieldProps) {
   return (
-    <Label className={cn("flex cursor-pointer items-center gap-2.5 text-[13px] font-medium normal-case tracking-normal text-foreground", className)}>
+    <Label className={cn("flex cursor-pointer items-center gap-3 text-sm font-medium normal-case tracking-normal text-foreground", className)}>
       <Checkbox checked={checked} onCheckedChange={onChange} />
       {label}
     </Label>

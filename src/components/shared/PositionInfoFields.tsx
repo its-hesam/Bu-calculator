@@ -34,7 +34,7 @@ export function PositionInfoFields({
 }: PositionInfoFieldsProps) {
   const t = commonTexts
   return (
-    <div className={cn("grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1", className)}>
+    <div className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-1", className)}>
       <FormField label={t.currency}>
         <Input placeholder={t.currencyPlaceholder} value={currency} onChange={e => onCurrencyChange(e.target.value.toUpperCase())} />
       </FormField>
