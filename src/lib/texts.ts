@@ -15,6 +15,7 @@ export const appTexts = {
     { key: "funding", label: "Funding Fee", description: "Periodic funding payments flowing between longs and shorts." },
     { key: "slip", label: "Slippage", description: "How far a trigger market fill drifts from your intended price." },
     { key: "fundflow", label: "Fund Flow", description: "Reconstruct a balance history from exported Excel transaction files." },
+    { key: "glossary", label: "Glossary", description: "Terminology and definitions that power the futures calculators." },
   ],
 }
 
@@ -758,7 +759,9 @@ export const slippageTexts = {
     pnlAtActual: (side: "long" | "short", entry: string, price: string, size: string, result: string) =>
       `${side === "long" ? "PnL at Actual Close (Long) = (Actual Close − Entry) × Size = (" : "PnL at Actual Close (Short) = (Entry − Actual Close) × Size = ("}${price} − ${entry}) × ${size} = ${result} USDT`,
     result: (pnlAtStopLoss: string, pnlAtActual: string, pnlDiff: string) =>
-      `Difference PnL = PnL at Actual Close − PnL at Stop Loss = (${pnlAtStopLoss} USDT) − (${pnlAtActual} USDT) = ${pnlDiff} USDT`,
+      `Difference PnL = PnL at Actual Close − PnL at Stop Loss = (${pnlAtActual} USDT) − (${pnlAtStopLoss} USDT) = ${pnlDiff} USDT`,
+    slippagePct: (stopLoss: string, actual: string, pct: string) =>
+      `Price Difference Percentage = |Stop Loss − Actual| ÷ Stop Loss × 100 = |${stopLoss} − ${actual}| ÷ ${stopLoss} × 100 = ${pct}%`,
   },
   about: {
     heading: "About Stop Loss Slippage",
@@ -766,6 +769,8 @@ export const slippageTexts = {
       "A Stop Loss is intended to close the position at a predefined price to limit losses. During volatile or illiquid market conditions, however, the actual fill price may be worse than the Stop Loss price. The slippage is the difference between the PnL you expected at the Stop Loss price and the PnL actually realized at the closing price.",
     paragraph2:
       "This behavior is considered normal for market orders and is a common occurrence across financial markets. It is not regarded as abnormal or unusual.",
+    paragraph3: (stopLoss: string, actual: string, pct: string) =>
+      `The slippage can also be expressed as a percentage: Slippage % = |Stop Loss − Actual| ÷ Stop Loss × 100. For this position: |${stopLoss} − ${actual}| ÷ ${stopLoss} × 100 = ${pct}%.`,
   },
 }
 
@@ -967,4 +972,262 @@ export const liqReductionTexts = {
       finalMove: string
     }) => `Regarding the liquidation of your ${p.pair} position:\n\n1. Liquidation Reduction (Calculation A):\nThe position size placed your position in ${p.tier}, which caused the applicable maintenance margin tier to change. Because the available margin could not sustain the required maintenance margin, the liquidation-reduction mechanism was triggered and the position was reduced in stages. The reduced quantities are based on the actual liquidation-reduction orders recorded in your Order History:\n${p.events.join("\n")}\n\n2. Final / Normal Liquidation (Calculation B):\nThe remaining position (${p.remainingSize}) was then evaluated separately for normal liquidation. Its estimated liquidation price is ${p.finalLiq}, which represents a ${p.finalMove} move for the ${p.direction} position.`,
   },
+}
+
+export interface GlossaryRow {
+  term: string
+  definition: string
+  note: string
+}
+
+export interface GlossarySection {
+  title: string
+  rows: GlossaryRow[]
+}
+
+export const glossaryTexts = {
+  title: "KuCoin Futures Glossary",
+  updated: "Last updated: 12/30/2025 14:52:54",
+  intro:
+    "Equip your mind with knowledge to better profit in the futures market! Learn the basics of futures trading now!",
+  columns: {
+    term: "Term",
+    definition: "Definition",
+    notes: "Additional Notes",
+  },
+  sections: [
+    {
+      title: "1. Basic Terms",
+      rows: [
+        {
+          term: "Futures Contract",
+          definition:
+            "A derivatives trading product based on the price of digital assets. Users can participate in price movements without holding the underlying spot assets.",
+          note: "Futures trading involves leverage and generally carries higher risk than spot trading.",
+        },
+        {
+          term: "Perpetual Contract",
+          definition:
+            "A type of futures contract with no expiration date or delivery settlement. A funding rate mechanism is used to keep the contract price anchored to the spot market price.",
+          note: "The most common contract type. Funding fees may apply, and profit and loss fluctuate in real time based on the mark price.",
+        },
+        {
+          term: "USD-Margined Contract",
+          definition:
+            "A futures contract that uses stablecoins such as USDT or USDC as margin and settlement currency.",
+          note: "Profit and loss are settled in stablecoins (e.g., USDT), making results more intuitive to calculate.",
+        },
+        {
+          term: "Coin-Margined Contract",
+          definition:
+            "A futures contract that uses digital assets such as BTC or ETH as margin and settlement currency.",
+          note: "Both profits and losses are settled in the corresponding digital asset (e.g., BTC or ETH).",
+        },
+        {
+          term: "Delivery Contract",
+          definition:
+            "A futures contract with a fixed expiration date. Upon expiry, the contract is settled and delivered according to predefined rules, with profit and loss confirmed at settlement. Prices typically track the spot or index price of the underlying asset.",
+          note: "KuCoin currently offers BTC coin-margined quarterly delivery contracts.",
+        },
+        {
+          term: "Pre-Market Contract",
+          definition:
+            "A type of contract that allows trading before the underlying asset is officially listed on the spot market, reflecting market expectations in advance. It will gradually transition to a perpetual contract after the spot listing.",
+          note: "Higher price volatility and liquidity risk. Suitable for users with sufficient understanding of the project and associated risks.",
+        },
+        {
+          term: "Contract Size (Lots)",
+          definition:
+            "The fundamental unit used to represent order size or position size in futures trading. Each lot corresponds to a specific contract value or quantity of the underlying asset.",
+          note: "Users can convert lots into notional value (e.g., USDT) or asset quantity (e.g., BTC) for easier understanding.",
+        },
+        {
+          term: "Contract Face Value",
+          definition:
+            "The amount of underlying asset or notional value represented by one contract (one lot). Futures trading uses “lots” as the minimum order unit. For example, in the BTCUSDT contract, 1 lot represents 0.001 BTC.",
+          note: "The face value varies across different contracts.",
+        },
+      ],
+    },
+    {
+      title: "2. Trade Direction & Position-Related",
+      rows: [
+        {
+          term: "Long / Buy",
+          definition:
+            "Establishing a long position by buying a contract when the user expects the contract price to rise.",
+          note: "Profits are generated when the contract price rises, and losses occur if the price falls.",
+        },
+        {
+          term: "Short / Sell",
+          definition:
+            "Establishing a short position by selling a contract when the user expects the contract price to fall.",
+          note: "Profits are generated when the contract price falls, and losses occur if the price rises.",
+        },
+        {
+          term: "Position",
+          definition:
+            "The current status of a user's contract holdings, including direction, quantity, and corresponding margin.",
+          note: "Profit and loss only occur while holding a position.",
+        },
+        {
+          term: "Open Interest / Position Quantity",
+          definition:
+            "The number of contracts a user holds that have not been closed. Positive numbers indicate long positions, negative numbers indicate short positions.",
+          note: "With leverage, users can hold positions far exceeding their margin.",
+        },
+        {
+          term: "Notional Value of Position",
+          definition:
+            "The market value of a contract position, which changes with the mark price.\n• USD-Margined Contract: Notional Value = Position Quantity × Contract Multiplier × Latest Mark Price\n• Coin-Margined Contract: Notional Value = Position Quantity × Contract Multiplier ÷ Latest Mark Price",
+          note: "Represents the value of the user's position at the current mark price. Actual settlement value is based on the final executed price.",
+        },
+      ],
+    },
+    {
+      title: "3. Leverage & Margin Mechanism",
+      rows: [
+        {
+          term: "Leverage",
+          definition:
+            "Used to amplify trading size, allowing users to control larger positions with less margin.",
+          note: "Higher leverage increases both potential profits and risks proportionally.",
+        },
+        {
+          term: "Initial Margin",
+          definition: "The minimum margin required when opening a position.",
+          note: "Directly related to position size and chosen leverage.",
+        },
+        {
+          term: "Initial Margin Rate",
+          definition: "The ratio of initial margin to the notional value of the position.",
+          note: "Usually equals the inverse of the selected leverage (i.e., 1 / leverage).",
+        },
+        {
+          term: "Maintenance Margin",
+          definition: "The minimum margin required to maintain an open position.",
+          note: "Falling below this level will trigger risk control measures.",
+        },
+        {
+          term: "Maintenance Margin Rate",
+          definition: "The ratio of maintenance margin to the notional value of the position.",
+          note: "In cross margin mode, positions are only liquidated when the risk rate reaches 100%. The liquidation price serves as a reference, not a strict execution trigger.",
+        },
+      ],
+    },
+    {
+      title: "4. Margin Mode",
+      rows: [
+        {
+          term: "Cross Margin Mode",
+          definition:
+            "Uses the entire available balance in the futures account as margin to support positions.",
+          note: "Losses in a single position may affect other funds in the account.",
+        },
+        {
+          term: "Isolated Margin Mode",
+          definition: "Each position has independently calculated margin and risk.",
+          note: "The maximum loss of a single position is limited to the allocated margin.",
+        },
+        {
+          term: "Auto Margin Add",
+          definition:
+            "When enabled in the leverage and position settings, the system will automatically transfer the required margin from available balance to the position if it is close to liquidation, increasing the position value to prevent forced liquidation.",
+          note: "Success depends on available account balance. This feature is only supported in isolated margin mode.",
+        },
+      ],
+    },
+    {
+      title: "5. Price System & Risk Control Mechanism",
+      rows: [
+        {
+          term: "Index Price",
+          definition:
+            "A reference price calculated as a weighted average of prices from multiple major spot exchanges.",
+          note: "Helps reduce the impact of abnormal prices on the contract.",
+        },
+        {
+          term: "Mark Price",
+          definition: "A reference price calculated based on the index price and related mechanisms.",
+          note: "Used to calculate profit and loss as well as liquidation prices.",
+        },
+        {
+          term: "Liquidation Price",
+          definition: "The price at which a position will be forcibly closed if the mark price reaches it.",
+          note: "Actual execution price may deviate from this reference.",
+        },
+        {
+          term: "Forced Liquidation",
+          definition:
+            "The process of automatically closing positions when the margin is insufficient to maintain them.",
+          note: "Prevents the account from going into a negative balance.",
+        },
+        {
+          term: "Average Entry Price",
+          definition: "The average price of a position after multiple trades.",
+          note: "",
+        },
+        {
+          term: "Average Position Value",
+          definition:
+            "The value of a position calculated based on the average entry price, which does not fluctuate with the mark price.\n• USD-Margined Contract: Value = Position Quantity × Contract Multiplier × Average Entry Price\n• Coin-Margined Contract: Value = Position Quantity × Contract Multiplier ÷ Average Entry Price",
+          note: "",
+        },
+        {
+          term: "Auto-Deleveraging (ADL)",
+          definition:
+            "A risk control mechanism that reduces part of profitable positions during extreme market conditions.",
+          note: "Usually triggered when the insurance fund is insufficient.",
+        },
+        {
+          term: "Isolated Margin Risk Limit",
+          definition: "A tiered risk limit in isolated margin mode, set according to position size.",
+          note: "As position size increases, the maximum available leverage decreases tier by tier, and the required maintenance margin increases, limiting large high-leverage position risks.",
+        },
+      ],
+    },
+    {
+      title: "6. P&L & Fee-Related",
+      rows: [
+        {
+          term: "Unrealized P&L",
+          definition: "Floating profit and loss calculated based on the current mark price.",
+          note: "Changes in real time with market price fluctuations.",
+        },
+        {
+          term: "Realized P&L",
+          definition:
+            "Profit and loss generated when a user partially or fully closes a position. Includes trading P&L, fees, and funding costs.",
+          note: "Reflects the actual profit and loss from the user's position operations.",
+        },
+        {
+          term: "Funding Rate",
+          definition:
+            "A mechanism in perpetual contracts to anchor the contract price to the spot price by having long and short positions pay each other periodically. Delivery contracts do not have funding rates. Different contracts may have different settlement intervals (e.g., 8h/4h/1h).",
+          note: "Used to balance deviations between contract and spot prices.\n• Funding Rate > 0: longs pay shorts\n• Funding Rate < 0: shorts pay longs",
+        },
+        {
+          term: "Funding Fee",
+          definition: "Funding Fee = Position Value × Funding Rate",
+          note: "Position value is determined by the mark price at the funding settlement time.",
+        },
+        {
+          term: "Trading Fee",
+          definition: "Fees incurred by users during futures trading.",
+          note: "Specific rates are subject to platform rules.",
+        },
+        {
+          term: "ROI",
+          definition: "ROI = Unrealized P&L ÷ Initial Margin",
+          note: "Allows users to estimate the profit/loss relative to initial capital when using leverage.",
+        },
+        {
+          term: "Trading Fee",
+          definition:
+            "The fee incurred by users during futures trading, which may vary depending on order type (maker/taker) and trading pair.",
+          note: "Fees are charged according to platform rules. Maker orders usually have lower fees or rebates, while taker orders typically have higher fees.",
+        },
+      ],
+    },
+  ] satisfies GlossarySection[],
 }

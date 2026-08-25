@@ -27,8 +27,6 @@ export interface IsoLinearResult {
 
 export function calcIsoLinear(input: IsoLinearInputs): IsoLinearResult {
   const { side, entryPrice, positionSize, mmrPct, leverage, availableMargin, stable } = input
-  const mmr = mmrPct / 100
-  const MM = positionSize * entryPrice * mmr
 
   let margin: number
   let marginSource: "direct" | "leverage"
@@ -44,7 +42,11 @@ export function calcIsoLinear(input: IsoLinearInputs): IsoLinearResult {
     marginSource = "leverage"
   }
 
-  const diff = (margin - MM) / positionSize
+  const mmr = mmrPct / 100
+  const MM = positionSize * mmr * entryPrice
+
+  const numerator = margin - MM
+  const diff = numerator / positionSize
   const liqPrice = side === "long" ? entryPrice - diff : entryPrice + diff
   const movePct = Math.abs(((liqPrice - entryPrice) / entryPrice) * 100).toFixed(4)
 
@@ -54,8 +56,8 @@ export function calcIsoLinear(input: IsoLinearInputs): IsoLinearResult {
 
   const steps: string[] = [
     isoTexts.linear.steps.mm(String(positionSize), String(entryPrice), String(mmrPct), fmt(MM, 6), stable),
-    isoTexts.linear.steps.subtract(fmt(margin, 6), fmt(MM, 6), fmt(margin - MM, 6), stable),
-    isoTexts.linear.steps.divide(fmt(margin - MM, 6), String(positionSize), fmt(diff, 6)),
+    isoTexts.linear.steps.subtract(fmt(margin, 6), fmt(MM, 6), fmt(numerator, 6), stable),
+    isoTexts.linear.steps.divide(fmt(numerator, 6), String(positionSize), fmt(diff, 6)),
     isoTexts.linear.steps.liq(String(entryPrice), side === "long" ? "−" : "+", fmt(diff, 6), liqPrice.toFixed(6)),
   ]
 

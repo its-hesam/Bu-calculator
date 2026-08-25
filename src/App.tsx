@@ -9,6 +9,7 @@ import { TradingFeeTab } from "@/components/calculator/TradingFeeTab"
 import { FundingFeeTab } from "@/components/calculator/FundingFeeTab"
 import { SlippageTab } from "@/components/calculator/SlippageTab"
 import { FundFlowPage } from "@/components/fund-flow/FundFlowPage"
+import { GlossaryPage } from "@/components/glossary/GlossaryPage"
 import {
   Calculator,
   ArrowLeftRight,
@@ -17,6 +18,7 @@ import {
   Banknote,
   GripHorizontal,
   FileSpreadsheet,
+  BookOpen,
   Menu,
   X,
 } from "lucide-react"
@@ -29,6 +31,7 @@ const toolIcons: Record<string, ReactNode> = {
   funding: <Banknote className="h-4.5 w-4.5" />,
   slip: <GripHorizontal className="h-4.5 w-4.5" />,
   fundflow: <FileSpreadsheet className="h-4.5 w-4.5" />,
+  glossary: <BookOpen className="h-4.5 w-4.5" />,
 }
 
 const toolComps: Record<string, ReactNode> = {
@@ -39,6 +42,7 @@ const toolComps: Record<string, ReactNode> = {
   funding: <FundingFeeTab />,
   slip: <SlippageTab />,
   fundflow: <FundFlowPage />,
+  glossary: <GlossaryPage />,
 }
 
 interface Tool {

@@ -141,6 +141,7 @@ export function SlippageTab() {
           <div className="rounded-xl border border-success/20 bg-success/[0.05] p-5">
             <h4 className="mb-1.5 flex items-center gap-2 text-[13px] font-semibold text-success"><Info className="h-4 w-4" /> {t.about.heading}</h4>
             <p className="text-xs leading-relaxed text-muted-foreground">{t.about.paragraph1}</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.about.paragraph3(stopLoss, actual, fmt(result.slippagePct, 6))}</p>
             <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.about.paragraph2}</p>
           </div>
 
@@ -157,6 +158,7 @@ export function SlippageTab() {
                 t.difference.pnlAtStopLoss(direction, entry, stopLoss, size, fmt(result.pnlAtStopLoss, 6)),
                 t.difference.pnlAtActual(direction, entry, actual, size, fmt(result.pnlAtActual, 6)),
                 t.difference.result(fmt(result.pnlAtStopLoss, 6), fmt(result.pnlAtActual, 6), `${result.slippagePnl >= 0 ? "+" : ""}${fmt(result.slippagePnl, 6)}`),
+                t.difference.slippagePct(stopLoss, actual, fmt(result.slippagePct, 6)),
               ].join("\n"),
             }}
           />

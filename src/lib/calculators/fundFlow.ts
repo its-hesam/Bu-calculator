@@ -65,17 +65,15 @@ export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFl
 
   const currentBalance = (input.frozen || 0) + (input.available || 0)
 
-  let b = currentBalance
-  for (let i = sorted.length - 1; i >= 0; i--) {
-    b = Number((b - sorted[i].amount).toFixed(8))
-  }
-  const oldestBalance = b
+  let total = 0
+  for (const r of sorted) total += r.amount
+  const oldestBalance = Number((currentBalance - total).toFixed(8))
 
   const rows: ProcessedRow[] = []
-  let balance = oldestBalance
+  let balance = currentBalance
   for (const r of sorted) {
-    const before = Number(balance.toFixed(8))
-    balance = Number((balance + r.amount).toFixed(8))
+    const after = Number(balance.toFixed(8))
+    const before = Number((balance - r.amount).toFixed(8))
     rows.push({
       time: convertUTC8(r.time),
       type: r.type,
@@ -83,11 +81,12 @@ export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFl
       contract: r.contract || "-",
       amount: r.amount,
       balanceBefore: before,
-      balanceAfter: balance,
+      balanceAfter: after,
     })
+    balance = before
   }
 
-  const finalBalance = rows.length ? rows[rows.length - 1].balanceAfter : currentBalance
+  const finalBalance = rows.length ? rows[0].balanceAfter : currentBalance
   const balanceDiff = Number((currentBalance - finalBalance).toFixed(8))
   const reconciled = Math.abs(balanceDiff) < 0.00000001
   const netChange = Number((currentBalance - oldestBalance).toFixed(8))
@@ -183,9 +182,9 @@ function dedupRows(rows: FundFlowRow[]): { unique: FundFlowRow[]; removed: numbe
 
 function sortRows(rows: FundFlowRow[]): FundFlowRow[] {
   return [...rows].sort((a, b) => {
-    const ak = a.parsed ? a.timeKey : Number.POSITIVE_INFINITY
-    const bk = b.parsed ? b.timeKey : Number.POSITIVE_INFINITY
-    return ak - bk
+    if (a.parsed !== b.parsed) return a.parsed ? -1 : 1
+    if (!a.parsed) return 0
+    return b.timeKey - a.timeKey
   })
 }
 
