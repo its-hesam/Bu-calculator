@@ -145,9 +145,9 @@ export const templates: Record<TemplateVariant, { colleague: string; user: strin
   },
   fundFlow: {
     colleague:
-      "Internal Note — Fund Flow Reconstruction\n\nMerged {{fileCount}} file(s) · processed {{count}} transactions ({{duplicates}} duplicate(s) removed).\n\nFinal Available Balance: {{finalBalance}} USDT\nBalance at the oldest transaction: {{oldest}} USDT\nNet Change: {{netChange}} USDT\n\nThe account balance was reconstructed backwards from the current balance (Frozen + Available) and verified forward across the complete transaction history.\n\nKindly review and confirm.",
+      "Internal Note — Fund Flow Reconstruction\n\nMerged {{fileCount}} file(s) · processed {{count}} transactions ({{duplicates}} duplicate(s) removed).\n\nFinal Wallet Balance: {{finalBalance}} USDT\nBalance at the oldest transaction: {{oldest}} USDT\nNet Change: {{netChange}} USDT\n\nThe wallet balance was reconstructed backwards from the current account state (Frozen + Available − Unrealized PnL) and verified forward across the complete transaction history.\n\nKindly review and confirm.",
     user:
-      "Dear Valued Customer,\n\nThank you for your patience.\n\nWe have carefully analyzed the complete transaction history of your Futures account.\n\nBased on the transaction history provided and the calculations performed, the available balance of your Futures account is **{{finalBalance}} USDT**.\n\nCalculation Summary:\n• Transactions Processed: {{count}}\n• Files Merged: {{fileCount}}\n• Duplicate Transactions Removed: {{duplicates}}\n• Balance at the oldest transaction: {{oldest}} USDT\n\nIf you have any questions about specific transactions, please do not hesitate to let us know.\n\nBest regards,\nCustomer Support Team",
+      "Dear Valued Customer,\n\nThank you for your patience.\n\nWe have carefully analyzed the complete transaction history of your Futures account.\n\nBased on the transaction history provided and the calculations performed, the wallet balance of your Futures account is **{{finalBalance}} USDT**.\n\nCalculation Summary:\n• Transactions Processed: {{count}}\n• Files Merged: {{fileCount}}\n• Duplicate Transactions Removed: {{duplicates}}\n• Balance at the oldest transaction: {{oldest}} USDT\n\nIf you have any questions about specific transactions, please do not hesitate to let us know.\n\nBest regards,\nCustomer Support Team",
   },
 }
 
@@ -775,7 +775,7 @@ export const slippageTexts = {
 }
 
 export const fundflowTexts = {
-  section: { title: "Excel Files & Balances", description: "Merge, deduplicate and process the complete transaction history to determine the available balance" },
+  section: { title: "Excel Files & Balances", description: "Merge, deduplicate and process the complete transaction history to reconstruct the wallet balance" },
   files: {
     add: "Add File",
     empty: "No files yet — click Add File to include one.",
@@ -786,17 +786,25 @@ export const fundflowTexts = {
   fields: {
     frozen: "Frozen as Margin",
     available: "Available Balance",
+    unrealizedPnl: "Unrealized PnL (signed)",
+  },
+  info: {
+    anchor: "The reconstruction is anchored on the wallet balance, derived from the current account state:",
+    formula: "Wallet Balance = Frozen as Margin + Available Balance − Unrealized PnL",
+    sign: "Enter Unrealized PnL as a signed value: profit positive, loss negative. This is required whenever a position is open — a losing position can push the Available Balance below zero, and the wallet balance stays correct because the loss is added back.",
   },
   calculate: "Calculate",
   scriptHeading: "Script",
   summaryHeading: "Summary",
   summary: {
-    finalBalance: "Final Available Balance",
+    finalBalance: "Final Wallet Balance",
     count: "Transactions",
     files: "Files",
     duplicates: "Duplicates Removed",
-    oldest: "Oldest Balance",
+    oldest: "Oldest Wallet Balance",
     netChange: "Net Change",
+    unrealizedPnl: "Unrealized PnL",
+    equity: "Equity (Frozen + Available)",
   },
   tableHeading: "Detailed Balance Reconstruction",
   table: {
@@ -829,6 +837,10 @@ export const fundflowTexts = {
       `The reconstructed history differs from the entered balance by ${diff} USDT. Please double-check the uploaded files and the entered Available / Frozen balances.`,
     currencies: (list: string) =>
       `The files contain multiple currencies (${list}). Amounts are summed as-is without currency conversion.`,
+    negativeAvailableWithoutPnl:
+      "The Available Balance is negative but no Unrealized PnL was entered. A negative Available Balance is normally caused by an open position at a loss — enter the Unrealized PnL (loss as a negative value) so the wallet balance is reconstructed correctly.",
+    negativeWallet:
+      "The reconstructed wallet balance is negative. This can happen after a liquidation or bankruptcy event; please verify the entered balances and transaction history.",
   },
   export: {
     sheetName: "Reconstructed_Balance",
@@ -849,7 +861,7 @@ Thank you for your patience.
 
 We have carefully analyzed the complete transaction history of your Futures account.
 
-Based on the transaction history provided and the calculations performed, the available balance of your Futures account is <strong>${data.finalBalance} USDT</strong>.
+Based on the transaction history provided and the calculations performed, the wallet balance of your Futures account is <strong>${data.finalBalance} USDT</strong>.
 
 Calculation Summary:
 <strong>Total Transactions Processed:</strong> ${data.txCount}

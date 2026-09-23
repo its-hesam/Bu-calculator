@@ -25,6 +25,7 @@ export interface FundFlowInputs {
   files: File[]
   frozen: number
   available: number
+  unrealizedPnl: number
 }
 
 export interface FundFlowResult {
@@ -41,7 +42,15 @@ export interface FundFlowResult {
   reconciled: boolean
   balanceDiff: number
   currencies: string[]
+  unrealizedPnl: number
+  equity: number
+  availableNegativeWithoutPnl: boolean
+  walletNegative: boolean
   reportText: string
+}
+
+function round8(x: number): number {
+  return Number(x.toFixed(8))
 }
 
 export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFlowResult> {
@@ -63,17 +72,24 @@ export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFl
   const sorted = sortRows(unique)
   const currencies = [...new Set(sorted.map(r => r.currency))]
 
-  const currentBalance = (input.frozen || 0) + (input.available || 0)
+  const frozen = input.frozen || 0
+  const available = input.available || 0
+  const unrealizedPnl = input.unrealizedPnl || 0
+
+  const equity = round8(frozen + available)
+  const currentBalance = round8(equity - unrealizedPnl)
+  const availableNegativeWithoutPnl = available < 0 && unrealizedPnl === 0
+  const walletNegative = currentBalance < 0
 
   let total = 0
   for (const r of sorted) total += r.amount
-  const oldestBalance = Number((currentBalance - total).toFixed(8))
+  const oldestBalance = round8(currentBalance - total)
 
   const rows: ProcessedRow[] = []
   let balance = currentBalance
   for (const r of sorted) {
-    const after = Number(balance.toFixed(8))
-    const before = Number((balance - r.amount).toFixed(8))
+    const after = round8(balance)
+    const before = round8(balance - r.amount)
     rows.push({
       time: convertUTC8(r.time),
       type: r.type,
@@ -87,9 +103,9 @@ export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFl
   }
 
   const finalBalance = rows.length ? rows[0].balanceAfter : currentBalance
-  const balanceDiff = Number((currentBalance - finalBalance).toFixed(8))
+  const balanceDiff = round8(currentBalance - finalBalance)
   const reconciled = Math.abs(balanceDiff) < 0.00000001
-  const netChange = Number((currentBalance - oldestBalance).toFixed(8))
+  const netChange = round8(currentBalance - oldestBalance)
 
   const reportText = generateReport({
     finalBalance,
@@ -114,6 +130,10 @@ export async function reconstructFundFlow(input: FundFlowInputs): Promise<FundFl
     reconciled,
     balanceDiff,
     currencies,
+    unrealizedPnl,
+    equity,
+    availableNegativeWithoutPnl,
+    walletNegative,
     reportText,
   }
 }

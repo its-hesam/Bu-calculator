@@ -1118,13 +1118,28 @@ files and checks whether the ledger reconciles with a provided current balance.
 | Input | Unit | Constraint |
 | --- | --- | --- |
 | `files` | Excel files | at least one file; each parsed from its first worksheet |
-| `frozen` | quote currency | optional number (default `0`) |
-| `available` | quote currency | optional number (default `0`) |
+| `frozen` | quote currency | optional number (default `0`); all locked margin (orders + positions) |
+| `available` | quote currency | optional number (default `0`); may be negative when a position is at a loss |
+| `unrealizedPnl` | quote currency | optional **signed** number (default `0`); profit positive, loss negative |
 
 ### Current balance
 
+The transaction export records realized cash flows, i.e. changes to the **wallet balance**.
+The account's current state exposes `equity = frozen + available`, and
+`equity = walletBalance + unrealizedPnl`, so:
+
 ```text
-currentBalance = frozen + available
+equity         = frozen + available
+currentBalance = equity − unrealizedPnl          # wallet balance (anchor)
+```
+
+`unrealizedPnl` is signed: a loss (negative) is added back, so a negative
+`available` caused by an open losing position still yields the correct wallet balance.
+When no position is open, `unrealizedPnl = 0` and `currentBalance = frozen + available`.
+
+```text
+availableNegativeWithoutPnl = available < 0 && unrealizedPnl === 0   # inconsistent inputs → warn
+walletNegative              = currentBalance < 0                     # warn, still computed
 ```
 
 ### Row normalization (column mapping)
@@ -1196,7 +1211,7 @@ netChange    = round8( currentBalance − oldestBalance )   # == total (Σ amoun
 2. Normalize each row (aliases, currency uppercasing, amount parsing, time parsing).
 3. Deduplicate identical rows.
 4. Sort newest-first; parsed rows before unparsed rows.
-5. `currentBalance = frozen + available`.
+5. `currentBalance = (frozen + available) − unrealizedPnl` (wallet balance anchor).
 6. Derive `oldestBalance` (opening balance) from the net sum of all transactions.
 7. Walk backward from `currentBalance` through the sorted rows, recording each row's
    balance before/after the transaction.
@@ -1206,7 +1221,7 @@ netChange    = round8( currentBalance − oldestBalance )   # == total (Σ amoun
 
 ### Example
 
-`frozen = 0`, `available = 1,000`. Three signed transactions:
+`frozen = 0`, `available = 1,000`, `unrealizedPnl = 0`. Three signed transactions:
 
 | # | Date/time | Type | Currency | Amount |
 | --- | --- | --- | --- | --- |
@@ -1251,6 +1266,29 @@ T2  amount -200  before 900.00000000  after 700.00000000
 T1  amount +500  before 400.00000000  after 900.00000000
 ```
 
+### Example — negative available balance
+
+An open position is at a loss, so `available` is negative while the wallet balance is
+still positive. `frozen = 500` (locked margin), `available = −200`,
+`unrealizedPnl = −300` (loss).
+
+```text
+equity         = 500 + (−200) = 300
+currentBalance = 300 − (−300) = 600.00000000     # wallet balance
+
+total          = 1,000 − 400  = 600
+oldestBalance  = 600 − 600    = 0.00000000
+
+sorted (newest first): T2, T1
+
+walk (running starts at 600):
+  T2: balanceAfter = 600;   balanceBefore = 600 − (−400) = 1,000  → running = 1,000
+  T1: balanceAfter = 1,000; balanceBefore = 1,000 − 1,000 = 0     → running = 0
+
+finalBalance = 600.00000000
+netChange    = 600 − 0 = 600.00000000
+```
+
 ### Edge cases / notes
 
 - Implementation detail: because `finalBalance` is read from the newest row whose
@@ -1264,6 +1302,9 @@ T1  amount +500  before 400.00000000  after 900.00000000
   when more than one currency is present.
 - Each file's first worksheet only is read.
 - Balance arithmetic rounds to 8 decimals at every step.
+- A negative `available` with `unrealizedPnl = 0` sets `availableNegativeWithoutPnl`
+  (inconsistent inputs → UI warning); a negative reconstructed wallet balance sets
+  `walletNegative` (UI warning). Neither aborts the calculation.
 
 ---
 

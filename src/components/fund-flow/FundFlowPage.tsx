@@ -9,6 +9,7 @@ import { Stat, MetricGrid } from "@/components/shared/Stat"
 import { ResultHero } from "@/components/shared/ResultHero"
 import { TemplateCards } from "@/components/shared/TemplateCards"
 import { ToolLayout } from "@/components/shared/ToolLayout"
+import { InfoNote } from "@/components/shared/InfoNote"
 import { fundflowTexts } from "@/lib/texts"
 import { reconstructFundFlow, exportToExcel, fmt, type FundFlowResult } from "@/lib/calculators"
 import {
@@ -26,6 +27,8 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
+  TrendingUp,
+  Wallet,
 } from "lucide-react"
 
 export function FundFlowPage() {
@@ -33,6 +36,7 @@ export function FundFlowPage() {
   const [files, setFiles] = useState<File[]>([])
   const [frozen, setFrozen] = useState("")
   const [available, setAvailable] = useState("")
+  const [unrealizedPnl, setUnrealizedPnl] = useState("")
   const [result, setResult] = useState<FundFlowResult | null>(null)
   const [error, setError] = useState("")
   const [processing, setProcessing] = useState(false)
@@ -54,6 +58,7 @@ export function FundFlowPage() {
         files,
         frozen: parseFloat(frozen) || 0,
         available: parseFloat(available) || 0,
+        unrealizedPnl: parseFloat(unrealizedPnl) || 0,
       })
       setResult(res)
     } catch (err) {
@@ -67,6 +72,7 @@ export function FundFlowPage() {
     setFiles([])
     setFrozen("")
     setAvailable("")
+    setUnrealizedPnl("")
     setResult(null)
     setError("")
     setPage(0)
@@ -104,7 +110,15 @@ export function FundFlowPage() {
               <FormField label={t.fields.available}>
                 <Input type="number" step="0.00000001" value={available} onChange={e => setAvailable(e.target.value)} />
               </FormField>
+              <FormField label={t.fields.unrealizedPnl}>
+                <Input type="number" step="0.00000001" value={unrealizedPnl} onChange={e => setUnrealizedPnl(e.target.value)} />
+              </FormField>
             </div>
+            <InfoNote>
+              <p>{t.info.anchor}</p>
+              <p className="mt-1 font-mono text-xs text-foreground">{t.info.formula}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{t.info.sign}</p>
+            </InfoNote>
           </div>
         </SectionCard>
       }
@@ -127,12 +141,24 @@ export function FundFlowPage() {
             sub={`Verified from ${result.txCount} transaction(s) across ${result.fileCount} file(s) · ${result.duplicateCount} duplicate(s) removed`}
           />
 
-          {(result.unparsedCount > 0 || result.currencies.length > 1 || !result.reconciled) && (
+          {(result.unparsedCount > 0 || result.currencies.length > 1 || !result.reconciled || result.availableNegativeWithoutPnl || result.walletNegative) && (
             <div className="space-y-2">
               {!result.reconciled && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>{t.warnings.reconcile(fmt(result.balanceDiff, 4))}</AlertDescription>
+                </Alert>
+              )}
+              {result.availableNegativeWithoutPnl && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{t.warnings.negativeAvailableWithoutPnl}</AlertDescription>
+                </Alert>
+              )}
+              {result.walletNegative && (
+                <Alert variant="warning">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{t.warnings.negativeWallet}</AlertDescription>
                 </Alert>
               )}
               {result.unparsedCount > 0 && (
@@ -152,8 +178,10 @@ export function FundFlowPage() {
 
           <div>
             <p className="eyebrow">{t.summaryHeading}</p>
-            <MetricGrid className="mt-3 sm:grid-cols-3">
+            <MetricGrid className="mt-3 sm:grid-cols-4">
               <Stat label={t.summary.finalBalance} value={`${fmt(result.finalBalance, 4)} USDT`} tone="success" icon={<FileDown className="h-4 w-4" />} />
+              <Stat label={t.summary.equity} value={`${fmt(result.equity, 4)} USDT`} icon={<Wallet className="h-4 w-4" />} />
+              <Stat label={t.summary.unrealizedPnl} value={`${result.unrealizedPnl >= 0 ? "+" : ""}${fmt(result.unrealizedPnl, 4)} USDT`} tone={result.unrealizedPnl >= 0 ? "success" : "danger"} icon={<TrendingUp className="h-4 w-4" />} />
               <Stat label={t.summary.count} value={fmt(result.txCount, 0)} icon={<RefreshCcw className="h-4 w-4" />} />
               <Stat label={t.summary.files} value={String(result.fileCount)} icon={<FileSpreadsheet className="h-4 w-4" />} />
               <Stat label={t.summary.duplicates} value={fmt(result.duplicateCount, 0)} tone={result.duplicateCount > 0 ? "warning" : "success"} icon={<AlertTriangle className="h-4 w-4" />} />
